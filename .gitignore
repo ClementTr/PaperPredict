@@ -151,3 +151,4 @@ venv.bak/
 data_processing/data_2014_2016.csv
 data_processing/df2_cleaned_full.csv
 Py3_PaperPredict/*
+newspaper/static/newspaper/data/mailinglist.txt
