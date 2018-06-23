@@ -152,3 +152,6 @@ data_processing/data_2014_2016.csv
 data_processing/df2_cleaned_full.csv
 Py3_PaperPredict/*
 newspaper/static/newspaper/data/mailinglist.txt
+newspaper/static/newspaper/data/RF.pkl
+newspaper/static/newspaper/data/x_test.pkl
+newspaper/static/newspaper/data/y_test.pkl
