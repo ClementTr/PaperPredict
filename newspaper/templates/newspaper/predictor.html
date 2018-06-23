@@ -2,45 +2,6 @@
 {% load static %}
 <!DOCTYPE html>
 
-{% block scriptJS %}
-<link href="{% static 'newspaper/js/jqvmap.css' %}" media="screen" rel="stylesheet" type="text/css" />
-<script src="{% static 'newspaper/js/jquery.vmap.js' %}" type="text/javascript"></script>
-<script src="{% static 'newspaper/js/jquery.vmap.france.js' %}" type="text/javascript"></script>
-<script src="{% static 'newspaper/js/jquery.vmap.colorsFrance.js' %}" type="text/javascript"></script>
-
-<script type="text/javascript">
-$(document).ready(function() {
-	$('#francemap').vectorMap({
-	  map: 'france_fr',
-		hoverOpacity: 0.5,
-		hoverColor: false,
-		backgroundColor: "#ffffff",
-		colors: couleurs,
-		borderColor: "#000000",
-		selectedColor: "#EC0000",
-		enableZoom: false,
-		showTooltip: true,
-    onRegionClick: function(element, code, region)
-    {
-        var message = 'Département {{ a }}: "'
-            + region
-            + '" || Code : "'
-            + code
-			      + '"';
-        console.log(message);
-        //document.getElementById("TextDept").innerHTML = region;
-        //document.getElementById("TextCode").innerHTML = code;
-        document.getElementById("selectDept").value = code;
-        if (region == "Paris") {
-          console.log("OOOOK");
-        }
-    }
-	});
-});
-</script>
-{% endblock scriptJS %}
-
-
 {% block main %}
 <!-- Navigation
 ==========================================-->
@@ -51,13 +12,12 @@ $(document).ready(function() {
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
         <span class="sr-only">Toggle navigation</span>
       </button>
-      <a class="navbar-brand" href="/"><font size=3>Newspapers Predictor</font></a>
+      <a class="navbar-brand" href="/predictor"><font size=3>Newspapers Predictor</font></a>
     </div>
 
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav navbar-right">
         <li><a href="/"><font>Home</font></a></li>
-        <li><a href="/france"><font color="#C6B068" size="5">France</font></a></li>
       </ul>
     </div>
   </div>
@@ -74,13 +34,13 @@ $(document).ready(function() {
           <form action="compute/" method="GET" class="form">
 
             <div class='input_select_container'>
-              
+
               <div class='input_select hover_class'>
                 <label for="algorithm">Algorithme de prédiction:</label>
                 <select id="algorithm" name='algorithm'>
-                  <option value="RF" selected>Random Forest</option> 
-                  <option value="AD">AdaBoost</option> 
-                </select> 
+                  <option value="RF" selected>Random Forest</option>
+                  <option value="AD">AdaBoost</option>
+                </select>
               </div>
 
               <div class='input_select hover_class'>
@@ -90,13 +50,13 @@ $(document).ready(function() {
               <div class='input_select hover_class'>
                 <label for="nb_weeks">Nombres de semaine à prédire:</label>
                 <select id="nb_weeks" name='nb_weeks'>
-                  <option value="1">1</option> 
-                  <option value="2" selected>2</option> 
-                  <option value="3">3</option> 
-                  <option value="4">4</option> 
-                </select>       
+                  <option value="1">1</option>
+                  <option value="2" selected>2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                </select>
               </div>
-              
+
             </div>
 
             <div class='input_select_container'>
@@ -105,7 +65,7 @@ $(document).ready(function() {
           </form>
         </div>
 
-        
+
       </div>
 
     </div>

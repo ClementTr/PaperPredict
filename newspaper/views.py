@@ -10,7 +10,7 @@ import json
 import os
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "adleads.settings")
-from .tools import predict
+from .tools import predict, send_email, construct_maildf
 
 
 def home(request):
@@ -159,8 +159,21 @@ def compute(request):
 
 
 def results(request):
-    if (request.method == "GET"):
-        pass
+    if (request.method == "POST"):
+
+        df_mails = construct_maildf()
+        test= df_mails.loc[[32,3,53,62],:]
+        gmail_user = 'filrouge.newspaper@gmail.com'
+        gmail_password = 'bestteamever'
+
+        for _, row in test.iterrows(): #remplacer test par df_mails pour l'envoyer à tout le monde
+            send_email(row)
+
+
+
+        return redirect('/predictor/results')
+
+
 
     context = {}
 

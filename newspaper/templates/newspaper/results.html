@@ -2,17 +2,6 @@
 {% load static %}
 <!DOCTYPE html>
 
-{% block scriptJS %}
-<link href="{% static 'newspaper/js/jqvmap.css' %}" media="screen" rel="stylesheet" type="text/css" />
-<script src="{% static 'newspaper/js/jquery.vmap.js' %}" type="text/javascript"></script>
-<script src="{% static 'newspaper/js/jquery.vmap.france.js' %}" type="text/javascript"></script>
-<script src="{% static 'newspaper/js/jquery.vmap.colorsFrance.js' %}" type="text/javascript"></script>
-
-<script src="{% static 'newspaper/js/d3.min.js' %}" type="text/javascript"></script>
-
-
-{% endblock scriptJS %}
-
 
 {% block main %}
 <!-- Navigation
@@ -24,7 +13,7 @@
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
         <span class="sr-only">Toggle navigation</span>
       </button>
-      <a class="navbar-brand" href="/"><font size=3>Newspapers Predictor</font></a>
+      <a class="navbar-brand" href="/predictor"><font size=3>Newspapers Predictor</font></a>
     </div>
 
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -48,6 +37,11 @@
       </div>
 
     </div>
+
+    <form method = "post" action = "{% url 'results' %}">
+      {% csrf_token %}
+      <input class="btn_resume" type="submit" value="Send emails">
+    </form>
 </div>
 {% endblock main %}
 
@@ -57,7 +51,7 @@
   console.log("Hello results !");
 
   let data;
-  $.getJSON("{% static 'newspaper/data/predictions.json' %}", json => { 
+  $.getJSON("{% static 'newspaper/data/predictions.json' %}", json => {
     data = json;
     console.log(data[0]);
   });
@@ -94,7 +88,7 @@
     for (let d of data){
       if (d.Delivered_prediction <= d.Sales){
         pessimistic += 1;
-      } 
+      }
       if (d.Delivered_prediction <= d.Pot_Sales){
         optimistic += 1;
       }
@@ -102,8 +96,8 @@
         reality += 1;
       }
     }
-    return {'r':reality/data.length, 
-            'o':Math.trunc(optimistic)/data.length, 
+    return {'r':reality/data.length,
+            'o':Math.trunc(optimistic)/data.length,
             'p':pessimistic/data.length
           };
   }
@@ -111,7 +105,7 @@
   const nb_sales = () => {
     let pessimistic = 0;
     let optimistic = 0;
-    let reality = 0; 
+    let reality = 0;
 
     for (let d of data){
       pessimistic += Math.min(d.Delivered_prediction, d.Sales);
@@ -124,7 +118,7 @@
 
   const nb_delivered = () => {
     let model = 0;
-    let reality = 0; 
+    let reality = 0;
 
     for (let d of data){
       model += d.Delivered_prediction;
