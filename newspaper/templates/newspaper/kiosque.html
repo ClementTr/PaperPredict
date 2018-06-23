@@ -1,0 +1,44 @@
+ {% extends 'newspaper/base.html'  %}
+{% load static %}
+<!DOCTYPE html>
+
+
+{% block navigation %}
+<!-- Navigation
+==========================================-->
+<nav id="tf-menu" class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <a class="navbar-brand" href="/"><font size=3>Newspapers Predictor</font></a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="/"><font>Home</font></a></li>
+        <li><a href="/france"><font>France</font></a></li>
+        <li><a href="/france/{{code_dept}}"><font>{{nom_departement}}</font></a></li>
+        <li><a href="/france/{{code_dept}}/{{nom_ville}}"><font>{{nom_ville}}</font></a></li>
+        <li><a href="/france/{{code_dept}}/{{nom_ville}}/{{kiosque}}"><font color="#C6B068" size="5">{{kiosque}}</font></a></li>
+
+      </ul>
+    </div>
+  </div>
+</nav>
+{% endblock navigation %}
+
+
+{% block main %}
+<!-- BODY -->
+<div class="row content" style="padding-top: 0px;">
+
+  <div class="col-sm-1 sidenav"></div>
+  <div class="col-sm-8 text-left">
+    <h2 style="margin-top: 20px; margin-bottom: 30px;">Prédiction pour {{kiosque}}</h2>
+  </div>
+  <div class="col-sm-1 sidenav"></div>
+
+</div>
+{% endblock main %}

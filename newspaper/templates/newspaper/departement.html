@@ -1,0 +1,273 @@
+{% extends 'newspaper/base.html' %}
+{% load static %}
+<!DOCTYPE html>
+
+{% block scriptJS %}
+<!-- D3js -->
+<script src="{% static 'newspaper/js/d3.min.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'newspaper/css/multi_lines_chart.css' %}">
+
+<!-- Bootstrap -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+{% endblock scriptJS %}
+
+{% block navigation %}
+<!-- Navigation
+==========================================-->
+<nav id="tf-menu" class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <a class="navbar-brand" href="/"><font size=3>Newspapers Predictor</font></a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="/"><font>Home</font></a></li>
+        <li><a href="/france"><font>France</font></a></li>
+        <li><a href="/france/{{code_dept}}"><font color="#C6B068" size="5">{{nom_departement}}</font></a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+{% endblock navigation %}
+
+
+{% block main %}
+<!-- BODY -->
+<div class="container">
+
+    <div class="row">
+
+  		<div class="col-sm-8">
+
+        <div class="col-sm-12" style=" padding-left: 0px; padding-right: 0px;">
+  				<div class="au-card m-b-30">
+  						<div class="au-card-inner">
+                <div class="well" style="margin-bottom: 0px; height: 144px;">
+                  <h5>Quelques informations sur l'année 2016 !</h5>
+                  <p class="description">
+                    Dans ce département ({{nom_departement}}) en 2016, le nombre moyen des journaux vendus
+                    par kiosque était de <font color="#FF7F0E">{{ dict_sales_mean|get_item:code_dept|get_item:2016 }}</font>
+                    et celui de journaux livrés était de
+                    <font color="#2076B4">{{ dict_deliveries_mean|get_item:code_dept|get_item:2016 }}</font>
+                  </p>
+                </div>
+  						</div>
+  				</div>
+        </div>
+
+  		</div>
+
+
+
+  		<div class="col-sm-4">
+
+  			<div class="col-sm-12" style=" padding-left: 0px; padding-right: 0px;">
+  				<div class="au-card m-b-30" style="padding-left: 20px;padding-bottom: 0px;padding-top: 15px;">
+  						<div class="au-card-inner">
+                <center>
+                  <form method = "post" action = "{% url 'departement' code_dept %}">
+                    {% csrf_token %}
+                      <select class="custom-select" name="getVille">
+                          <optgroup label="{{ nom_departement }}">
+                            {% for ville in list_ville_spec_dept %}
+                              <option>{{ ville }}</option>
+                            {% endfor %}
+                          </optgroup>
+                      </select>
+                      <input class="btn_resume" style="width: 202px;" type="submit" value="Aller à la ville">
+                  </form>
+                </center>
+  						</div>
+  				</div>
+  			</div>
+
+  		</div>
+
+		</div>
+
+    <div class="row">
+      <div class="col-sm-4" style=" padding-left: 0px; padding-right: 0px;">
+        <div class="au-card m-b-30" style="padding-left: 20px;padding-bottom: 0px;padding-top: 15px;">
+            <div class="au-card-inner">
+              <div class="well">
+                <h5>Ventes et livraisons</h5>
+                <div class="chart-wrapper" id="chart-line1"></div>
+              </div>
+            </div>
+        </div>
+      </div>
+      <div class="col-sm-4" style=" padding-left: 0px; padding-right: 0px;">
+        <div class="au-card m-b-30" style="padding-left: 20px;padding-bottom: 0px;padding-top: 15px;">
+            <div class="au-card-inner">
+              <div class="well">
+                <h5>Moyenne des ruptures en 2016</h5>
+                <div class="chart-wrapper" id="speedometer"></div>
+              </div>
+            </div>
+        </div>
+      </div>
+      <div class="col-sm-4" style=" padding-left: 0px; padding-right: 0px;">
+        <div class="au-card m-b-30" style="padding-left: 20px;padding-bottom: 0px;padding-top: 15px;">
+            <div class="au-card-inner">
+              <div class="well">
+                <h5>Types de Segments</h5>
+                <div class="chart-wrapper" id="pie_chart"></div>
+              </div>
+            </div>
+        </div>
+      </div>
+    </div>
+
+</div>
+{% endblock main %}
+
+
+{% block d3v4 %}
+<!-- MULTI LINES CHART -->
+<script src="{% static 'newspaper/js/departement_multi_lines.js' %}" type="text/javascript"></script>
+<script type="text/javascript">
+  let d3v4 = d3
+  const w = 330, h = 300;
+  const margin = {
+      top: 10,
+      right: 10,
+      bottom: 60,
+      left: 60,
+  };
+  const innerW = w - margin.left - margin.right;
+  const innerH = h - margin.top - margin.bottom;
+
+  //let dataset = [];
+  let x, y;
+  let bisectDate = d3v4.bisector(d => d.date).left;
+
+  //Create SVG element
+  let svg = d3v4.select("#chart-line1")
+      .append("svg")
+      .attr("width", w+40) //Pour afficher les valeurs en fin de courbe
+      .attr("height", h)
+      .attr("id", "depChart")
+      .append("g")
+      .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+  let parseTime = d3v4.timeParse("%m-%Y");
+  let formatTime = d3v4.timeFormat("%m-%Y");
+
+  let svgHTML = document.getElementById("depChart");
+
+  /*DATA LOADER FROM DJANGO*/
+  let data_sales_deliveries = {{ json_dept_sales_deliveries|safe }};
+  let data_plot = [];
+  data_sales_deliveries = JSON.parse(data_sales_deliveries);
+
+  data_sales_deliveries.forEach(function(item, index){
+    data_plot.push({
+      "date": parseTime(item["Date"]),
+      "sales": Number(item["Sales"]),
+      "deliveries": Number(item["Delivered"])});
+  });
+
+  if (data_plot.length > 0) {
+       x = d3v4.scaleLinear()
+           .domain(d3v4.extent(data_plot, row => row.date))
+           .range([0, innerW]);
+       y = d3v4.scaleLinear()
+           .domain([0, d3v4.max(data_plot, row => Math.max(row.deliveries, row.sales))])
+           .range([innerH, 0]);
+       draw(data_plot);
+   }
+
+
+</script>
+
+<!-- PIE CHART -->
+<script src="{% static 'newspaper/js/pieChart.js' %}"></script>
+<script>
+
+    var donut = donutChart()
+                  .width(document.getElementById("pie_chart").clientWidth)
+                  .height(280) //document.getElementById("pie_chart").clientHeight*9
+                  .cornerRadius(4) // sets how rounded the corners are on each slice
+                  .padAngle(0.015) // effectively dictates the gap between slices
+                  .variable('Value')
+                  .category('Segment');
+
+    /*DATA LOADER FROM DJANGO*/
+    let data_spec_segments = {{ json_dept_spec_segments|safe }};
+    let data_pie = [];
+    data_spec_segments = JSON.parse(data_spec_segments);
+    //console.log(data_spec_segments)
+
+    data_spec_segments.forEach(function(item, index){
+      data_pie.push({
+        "Value": Number(item["Value"]),
+        "Segment": String(item["Segment"])});
+    });
+
+    if (data_pie.length > 0) {
+      console.log(data_pie)
+      d3v4.select('#pie_chart').datum(data_pie).call(donut);
+    }
+
+
+</script>
+{% endblock d3v4 %}
+
+
+{% block d3v3 %}
+<script src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/datamaps/0.5.8/datamaps.all.js"></script>
+<script type="text/javascript" src="http://iop.io/js/vendor/d3.v3.min.js"></script>
+<script type="text/javascript" src="http://iop.io/js/vendor/polymer/PointerEvents/pointerevents.js"></script>
+<script type="text/javascript" src="http://iop.io/js/vendor/polymer/PointerGestures/pointergestures.js"></script>
+<script type="text/javascript" src="http://iop.io/js/iopctrl.js"></script>
+
+<script>
+  let mean_ruptures_val = "{{mean_ruptures_val}}"
+  var svg_speedo = d3.select("#speedometer")
+          .append("svg:svg")
+          .attr("width", 330)
+          .attr("height", 300);
+
+  var gauge = iopctrl.arcslider()
+          .radius(120)
+          .events(false)
+          .indicator(iopctrl.defaultGaugeIndicator);
+
+  gauge.axis().orient("in")
+          .normalize(true)
+          .ticks(12)
+          .tickSubdivide(3)
+          .tickSize(10, 8, 10)
+          .tickPadding(5)
+          .scale(d3.scale.linear()
+                  .domain([0, 100])
+                  .range([-3*Math.PI/4, 3*Math.PI/4]));
+
+  var segDisplay = iopctrl.segdisplay()
+          .width(80)
+          .digitCount(6)
+          .negative(false)
+          .decimals(0);
+
+  svg_speedo.append("g")
+          .attr("class", "segdisplay")
+          .attr("transform", "translate(130, 200)")
+          .call(segDisplay);
+
+  svg_speedo.append("g")
+          .attr("class", "gauge")
+          .call(gauge);
+
+  segDisplay.value(mean_ruptures_val*100);
+  gauge.value(mean_ruptures_val*100);
+
+</script>
+{% endblock d3v3 %}

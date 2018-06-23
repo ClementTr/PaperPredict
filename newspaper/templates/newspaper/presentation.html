@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+
+<style>
+.center {
+    margin-left: auto;
+    margin-right: auto;
+    display: block
+}
+
+.bar { fill: steelblue; }
+</style>
+
+<body>
+
+
+
+<h1>Système de livraison des quotidiens</h1>
+<video class="center" width="900" height="600" autoplay>
+  <source src="/static/newspaper/img/Distribution.mov" type="video/mp4">
+
+
+</video>
+
+<p>" Empiriquement, les éditeurs de presse évaluent les ventes futures pour tous les points de ventes et livrent tous les points de ventes. L'évaluation des ventes est critique, il faut d'une part eviter le gaspillage et d'autres part éviter les ruptures de stock" </p>
+
+
+
+<h1>Répartition des Kiosques en Fonction de leurs Ventes Quotidiennes Moyennes</h1>
+<script src="http://d3js.org/d3.v4.min.js"></script>
+<script>
+
+// set the dimensions and margins of the graph
+var margin = {top: 20, right: 20, bottom: 30, left: 40},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+// set the ranges
+var x = d3.scaleBand()
+          .range([0, width])
+          .padding(0.1);
+var y = d3.scaleLinear()
+          .range([height, 0]);
+
+// append the svg object to the body of the page
+// append a 'group' element to 'svg'
+// moves the 'group' element to the top left margin
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+
+// get the data
+d3.csv("/static/newspaper/data/sales.csv", function(error, data) {
+  if (error) throw error;
+
+  // format the data
+  data.forEach(function(d) {
+    d.sales = +d.sales;
+  });
+
+  // Scale the range of the data in the domains
+  x.domain(data.map(function(d) { return d.salesperson; }));
+  y.domain([0, d3.max(data, function(d) { return d.sales; })]);
+
+  // append the rectangles for the bar chart
+  svg.selectAll(".bar")
+      .data(data)
+    .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", function(d) { return x(d.salesperson); })
+      .attr("width", x.bandwidth())
+      .attr("y", function(d) { return y(d.sales); })
+      .attr("height", function(d) { return height - y(d.sales); });
+
+  // add the x Axis
+  svg.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x));
+
+  // add the y Axis
+  svg.append("g")
+      .call(d3.axisLeft(y));
+
+});
+
+</script>
+
+<p>" La plupart des points de ventes de France vendent une faible quantité de quotidiens. " </p>
+
+
+</body>
+</html>

@@ -1,0 +1,148 @@
+{% extends 'newspaper/base.html' %}
+{% load static %}
+<!DOCTYPE html>
+
+{% block scriptJS %}
+<link href="{% static 'newspaper/js/jqvmap.css' %}" media="screen" rel="stylesheet" type="text/css" />
+<script src="{% static 'newspaper/js/jquery.vmap.js' %}" type="text/javascript"></script>
+<script src="{% static 'newspaper/js/jquery.vmap.france.js' %}" type="text/javascript"></script>
+<script src="{% static 'newspaper/js/jquery.vmap.colorsFrance.js' %}" type="text/javascript"></script>
+
+<script src="{% static 'newspaper/js/d3.min.js' %}" type="text/javascript"></script>
+
+
+{% endblock scriptJS %}
+
+
+{% block main %}
+<!-- Navigation
+==========================================-->
+<!--<nav id="tf-menu" class="navbar navbar-default navbar-fixed-top">-->
+<nav id="tf-menu" class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <a class="navbar-brand" href="/"><font size=3>Newspapers Predictor</font></a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="/"><font>Home</font></a></li>
+        <li><a href="/france"><font color="#C6B068" size="5">France</font></a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- BODY -->
+<div class="container">
+    <div class="row">
+
+      <h2>RESULTS</h2>
+
+      <div>
+        <label for="nb_sigma">Nombres de sigma à utiliser: <span id='nb_sigma_value'>0.68</span></label>
+        <input id='nb_sigma' type='range' min='0' max='3' step='0.01' value='0.68'></input>
+      </div>
+
+    </div>
+</div>
+{% endblock main %}
+
+{% block d3v4 %}
+
+<script type="text/javascript">
+  console.log("Hello results !");
+
+  let data;
+  $.getJSON("{% static 'newspaper/data/predictions.json' %}", json => { 
+    data = json;
+    console.log(data[0]);
+  });
+
+  let sigma_range = document.getElementById('nb_sigma');
+  console.log(sigma_range);
+  sigma_range.addEventListener('change', e => {
+    let sigma = e.target.value;
+    document.getElementById('nb_sigma_value').innerHTML = sigma;
+    compute_deli(sigma);
+
+    let ruptures = nb_rupture();
+    console.log('Ruptures R/P/O', ruptures.r, ruptures.p, ruptures.o);
+    let sales = nb_sales();
+    console.log('Sales R/P/O', sales.r, sales.p, sales.o);
+    let delivered = nb_delivered();
+    console.log('Delivered R/P/O', delivered.r, delivered.p, delivered.o);
+
+    let unsales = nb_unsales(sales, delivered);
+    console.log('Unsales R/P/O', unsales.r, unsales.p, unsales.o);
+  });
+
+  const compute_deli = sigma => {
+    data.forEach(d => {
+      d['Delivered_prediction'] = Math.trunc(d.Predictions + +sigma*d.std_gauss);
+    });
+  }
+
+  const nb_rupture = () => {
+    let pessimistic = 0;
+    let optimistic = 0;
+    let reality = 0;
+
+    for (let d of data){
+      if (d.Delivered_prediction <= d.Sales){
+        pessimistic += 1;
+      } 
+      if (d.Delivered_prediction <= d.Pot_Sales){
+        optimistic += 1;
+      }
+      if (d.Delivered <= d.Sales){
+        reality += 1;
+      }
+    }
+    return {'r':reality/data.length, 
+            'o':Math.trunc(optimistic)/data.length, 
+            'p':pessimistic/data.length
+          };
+  }
+
+  const nb_sales = () => {
+    let pessimistic = 0;
+    let optimistic = 0;
+    let reality = 0; 
+
+    for (let d of data){
+      pessimistic += Math.min(d.Delivered_prediction, d.Sales);
+      optimistic += Math.min(d.Delivered_prediction, d.Pot_Sales);
+      reality += d.Sales;
+    }
+
+    return {'r':reality, 'o':Math.trunc(optimistic), 'p':pessimistic};
+  }
+
+  const nb_delivered = () => {
+    let model = 0;
+    let reality = 0; 
+
+    for (let d of data){
+      model += d.Delivered_prediction;
+      reality += d.Delivered;
+    }
+    return {'r':reality, 'o':model, 'p':model};
+  }
+
+  const nb_unsales = (sales, delivered) => {
+    return {'r': delivered.r - sales.r,
+            'o': delivered.o - sales.o,
+            'p': delivered.p - sales.p}
+  }
+
+  // get nb_ rupture
+
+
+
+
+</script>
+{% endblock d3v4 %}

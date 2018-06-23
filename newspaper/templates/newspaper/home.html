@@ -1,0 +1,64 @@
+{% extends 'newspaper/base.html' %}
+{% load static %}
+
+{% block navigation %}
+<!-- Navigation
+==========================================-->
+<nav id="tf-menu" class="navbar navbar-default navbar-fixed-top">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <a class="navbar-brand" href="/"><font size=3>Newspapers Predictor</font></a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="/"><font color="#C6B068" size="5">Home</font></a></li>
+        <li><a href="/france"><font>France</font></a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+{% endblock navigation %}
+
+
+{% block main %}
+<!-- Home Page
+==========================================-->
+<div id="tf-home" class="text-center">
+    <div class="overlay">
+        <div class="content">
+            <h1>Welcome on <strong><span class="color">Newspapers Predictor</span></strong></h1>
+            <p class="lead">Optimize your distribution</p>
+            <form method = "post" action = "{% url 'home' %}">
+              {% csrf_token %}
+              <input class="btn_resume" type="submit" value="Take a Look">
+            </form>
+
+            <form method = "post" action = "{% url 'presentation' %}">
+              {% csrf_token %}
+              <input class="btn_resume" type="submit" value="Présentation">
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock main %}
+
+
+{% block footer %}
+<!-- Footer Page
+==========================================-->
+<nav id="footer">
+    <div class="container">
+        Feel free to contact us.
+        <div class="pull-right fnav">
+            <ul class="footer-social">
+                <li><a href="https://www.linkedin.com/in/cl%C3%A9ment-tailleur/" target="_blank"><i class="fab fa-linkedin"></i></a></li>
+                <li><a href="http://clementtailleur.com/" target="_blank"><i class="fab fa-github"></i></a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+{% endblock footer %}
