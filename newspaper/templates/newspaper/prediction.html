@@ -1,0 +1,134 @@
+{% extends 'newspaper/base.html' %}
+{% load static %}
+<!DOCTYPE html>
+
+{% block main %}
+<!-- Navigation
+==========================================-->
+<!--<nav id="tf-menu" class="navbar navbar-default navbar-fixed-top">-->
+<nav id="tf-menu" class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+      <a class="navbar-brand" href="#"><font size="3">Partie Prédiction</font></a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="/"><font>Home</font></a></li>
+        <li><a href="/"><font color="#C6B068" size="5">Prédiction</font></a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- BODY -->
+<div class="container">
+    <div class="row">
+
+      <h2 style="padding-bottom: 30px;">Outil de Prédiction</h2>
+      <div id='predict_container'>
+        <div id='left_predict'>
+
+          <form action="compute/" method="GET" class="form">
+
+            <div class='row'>
+
+              <div class="col-sm-4">
+								<div class="au-card m-b-30">
+										<div class="au-card-inner">
+												<div class="well" style="height: 115px">
+                          <label for="algorithm" style="padding-bottom: 10px">Algorithme de prédiction</label>
+                          <br>
+                          <center>
+                            <select id="algorithm" name='algorithm' class="custom-select" style="width:200px; height:25px">
+                              <option value="RF" selected>Random Forest</option>
+                              <option value="AD">AdaBoost</option>
+                            </select>
+                          </center>
+                        </div>
+										</div>
+								</div>
+							</div>
+
+              <div class="col-sm-4">
+								<div class="au-card m-b-30">
+										<div class="au-card-inner">
+												<div class="well" style="height: 115px">
+                          <label for="start">Date de début</label>
+                          <br>
+                          <center>
+                            <input type="date" id="start" name="start" min="2016-06-01" max="2016-12-31" value="2016-06-26">
+                          </center>
+                        </div>
+										</div>
+								</div>
+							</div>
+
+              <div class="col-sm-4">
+								<div class="au-card m-b-30">
+										<div class="au-card-inner">
+												<div class="well" style="height: 115px">
+                          <label for="nb_weeks" style="padding-bottom: 10px">Nombres de semaine à prédire</label>
+                          <br>
+                          <center>
+                            <select id="nb_weeks" name='nb_weeks' class="custom-select" style="width:50px; height:25px">
+                              <option value="1">1</option>
+                              <option value="2" selected>2</option>
+                              <option value="3">3</option>
+                              <option value="4">4</option>
+                            </select>
+                          </center>
+                        </div>
+										</div>
+								</div>
+							</div>
+
+              <div class="col-sm-12">
+								<div class="au-card m-b-30">
+										<div class="au-card-inner">
+                      <center>
+                        <input class="btn_resume" type="submit" value="Lancer la prédiction">
+                      </center>
+										</div>
+								</div>
+							</div>
+
+
+              <!-- <div class='result-header'>
+                <label for="algorithm">Algorithme de prédiction:</label>
+                <select id="algorithm" name='algorithm' class="custom-select" style="width:200px; height:25px">
+                  <option value="RF" selected>Random Forest</option>
+                  <option value="AD">AdaBoost</option>
+                </select>
+              </div> -->
+
+              <!-- <div class='result-header'>
+                <label for="start">Date de début:</label>
+                <input type="date" id="start" name="start" min="2016-06-01" max="2016-12-31" value="2016-06-26">
+              </div> -->
+
+
+              <!-- <div class='result-header'>
+                <label for="nb_weeks">Nombres de semaine à prédire:</label>
+                <select id="nb_weeks" name='nb_weeks' class="custom-select" style="width:50px; height:25px">
+                  <option value="1">1</option>
+                  <option value="2" selected>2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                </select>
+              </div> -->
+
+            </div>
+
+
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+</div>
+{% endblock main %}

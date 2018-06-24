@@ -18,13 +18,14 @@
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
         <span class="sr-only">Toggle navigation</span>
       </button>
-      <a class="navbar-brand" href="/predictor"><font size=3>Newspapers Predictor</font></a>
+      <a class="navbar-brand" href="#"><font size="3">Partie Prédiction</font></a>
     </div>
 
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav navbar-right">
-        <li><a href="/"><font>Home</font></a></li>
-        <li><a href="/france"><font color="#C6B068" size="5">France</font></a></li>
+        <li><a href="/">Home</a></li>
+        <li><a href="/prediction">Prédiction</a></li>
+        <li><a href="#"><font color="#C6B068" size="5">Résultats</font></a></li>
       </ul>
     </div>
   </div>
@@ -63,17 +64,17 @@
         </div>
         <div class='plot_container'>VENTES
           <div class='single_result_plot hover_class' id='sales'></div>
-        </div>              
+        </div>
         <div class='plot_container'>INVENDUS
           <div class='single_result_plot hover_class' id='unsales'></div>
-        </div>  
+        </div>
         <div class='plot_container'>RUPTURES
           <div class='single_result_plot hover_class' id='ruptures'></div>
         </div>
     </div>
 
 
-    <form method = "post" action = "{% url 'results' %}">
+    <form method = "post" action = "{% url 'resultats' %}">
       {% csrf_token %}
       <input class="btn_resume" type="submit" value="Send emails">
     </form>
@@ -92,7 +93,7 @@
 <script type="text/javascript">
 
 
-  
+
   let cost;
   let benefit;
   let sigma;
@@ -108,7 +109,7 @@
     data = json;
     console.log(data[0]);
 
-    
+
 
     const compute_deli = sigma => {
       data.forEach(d => {
@@ -261,6 +262,6 @@
 
   });
 
-  
+
 </script>
 {% endblock d3v4 %}

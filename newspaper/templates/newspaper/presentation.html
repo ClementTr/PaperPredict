@@ -1,7 +1,10 @@
+{% extends 'newspaper/base.html' %}
+{% load static %}
 <!DOCTYPE html>
-<html>
-<meta charset="UTF-8">
 
+{% block scriptJS %}
+<!-- D3js -->
+<script src="{% static 'newspaper/js/d3.min.js' %}"></script>
 <style>
 .center {
     margin-left: auto;
@@ -11,30 +14,93 @@
 
 .bar { fill: steelblue; }
 </style>
-
-<body>
-
+{% endblock scriptJS %}
 
 
-<h1>Système de livraison des quotidiens</h1>
-<video class="center" width="900" height="600" autoplay>
-  <source src="/static/newspaper/img/Distribution.mov" type="video/mp4">
+{% block main %}
+<!-- Navigation
+==========================================-->
+<!--<nav id="tf-menu" class="navbar navbar-default navbar-fixed-top">-->
+<nav id="tf-menu" class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+      </button>
+    </div>
+
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="/"><font>Home</font></a></li>
+        <li><a href="/presentation"><font color="#C6B068" size="5">Presentation</font></a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- BODY -->
+<div class="container">
+
+		<div class="row">
+
+							<div class="col-sm-7">
+
+								<div class="au-card m-b-30">
+										<div class="au-card-inner" style="">
+                      <h3 style="padding-bottom: 25px;">Système de livraison des quotidiens</h3>
+                      <video class="center" width="600" autoplay>
+                        <source src="/static/newspaper/img/Distribution.mov" type="video/mp4">
+                      </video>
+										</div>
+								</div>
+
+                <div class="au-card m-b-30">
+										<div class="au-card-inner" style="padding-top: 20px">
+                      <div class="well" style="text-align: justify;">
+                        Empiriquement, les éditeurs de presse évaluent les ventes futures pour tous les points de ventes et livrent tous les points de ventes.
+                        L'évaluation des ventes est critique, il faut d'une part eviter le gaspillage et d'autres part éviter les ruptures de stock
+                      </div>
+										</div>
+								</div>
+
+							</div>
 
 
-</video>
+							<div class="col-sm-5">
 
-<p>" Empiriquement, les éditeurs de presse évaluent les ventes futures pour tous les points de ventes et livrent tous les points de ventes. L'évaluation des ventes est critique, il faut d'une part eviter le gaspillage et d'autres part éviter les ruptures de stock" </p>
+								<div class="col-sm-12" style=" padding-left: 0px; padding-right: 0px;">
+									<div class="au-card m-b-30" style="padding-left: 20px;padding-bottom: 0px;padding-top: 15px;">
+											<div class="au-card-inner">
+                        <h5>Répartition des kiosques en fonction de leurs ventes quotidiennes moyennes</h5>
+                        <div class="chart-wrapper" id="barchart"></div>
+											</div>
+									</div>
+								</div>
+
+								<div class="col-sm-12" style=" padding-left: 0px; padding-right: 0px;">
+					        <div class="au-card m-b-30" style="padding-left: 20px;padding-bottom: 0px;padding-top: 15px;">
+					            <div class="au-card-inner">
+                          › La plupart des points de ventes de France vendent une faible quantité de quotidiens.
+					            </div>
+					        </div>
+					      </div>
+
+							</div>
+
+		</div>
 
 
+</div>
+{% endblock main %}
 
-<h1>Répartition des Kiosques en Fonction de leurs Ventes Quotidiennes Moyennes</h1>
+{% block d3v4 %}
 <script src="http://d3js.org/d3.v4.min.js"></script>
 <script>
 
 // set the dimensions and margins of the graph
 var margin = {top: 20, right: 20, bottom: 30, left: 40},
-    width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+    width = 450 - margin.left - margin.right,
+    height = 300 - margin.top - margin.bottom;
 
 // set the ranges
 var x = d3.scaleBand()
@@ -46,7 +112,7 @@ var y = d3.scaleLinear()
 // append the svg object to the body of the page
 // append a 'group' element to 'svg'
 // moves the 'group' element to the top left margin
-var svg = d3.select("body").append("svg")
+var svg = d3.select("#barchart").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
   .append("g")
@@ -88,9 +154,4 @@ d3.csv("/static/newspaper/data/sales.csv", function(error, data) {
 });
 
 </script>
-
-<p>" La plupart des points de ventes de France vendent une faible quantité de quotidiens. " </p>
-
-
-</body>
-</html>
+{% endblock d3v4 %}

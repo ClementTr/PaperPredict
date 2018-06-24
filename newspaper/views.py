@@ -147,9 +147,9 @@ def ville(request, code_dept, nom_ville):
 
 
 
-def predictor(request):
+def prediction(request):
     context = {}
-    return render(request,  'newspaper/predictor.html', context)
+    return render(request,  'newspaper/prediction.html', context)
 
 
 def compute(request):
@@ -162,10 +162,10 @@ def compute(request):
         if predict(path, algo, start, nb_weeks):
             print('\n\n JSON File Saved \n\n')
 
-    return redirect('/predictor/results'+'/')
+    return redirect('/prediction/resultats'+'/')
 
 
-def results(request):
+def resultats(request):
     if (request.method == "POST"):
 
         # df_mails = construct_maildf()
@@ -179,13 +179,13 @@ def results(request):
         fake_send_email()
 
 
-        return redirect('/predictor/results')
+        return redirect('/prediction/resultats')
 
 
 
     context = {}
 
-    return render(request,  'newspaper/results.html', context)
+    return render(request,  'newspaper/resultats.html', context)
 
 
 def fake_send_email():

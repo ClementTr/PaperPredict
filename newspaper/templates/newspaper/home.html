@@ -10,13 +10,14 @@
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
         <span class="sr-only">Toggle navigation</span>
       </button>
-      <a class="navbar-brand" href="/predictor"><font size=3>Newspapers Predictor</font></a>
+      <!-- <a class="navbar-brand" href="/prediction"><font size=3>Newspapers prediction</font></a> -->
     </div>
 
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav navbar-right">
         <li><a href="/"><font color="#C6B068" size="5">Home</font></a></li>
-        <li><a href="/france"><font>France</font></a></li>
+        <li><a href="/france"><font>Analyse</font></a></li>
+        <li><a href="/prediction"><font>Prédiction</font></a></li>
       </ul>
     </div>
   </div>
@@ -30,12 +31,12 @@
 <div id="tf-home" class="text-center">
     <div class="overlay">
         <div class="content">
-            <h1>Welcome on <strong><span class="color">Newspapers Predictor</span></strong></h1>
+            <h1>Welcome on <strong><span class="color">Newspapers prediction</span></strong></h1>
             <p class="lead">Optimize your distribution</p>
-            <form method = "post" action = "{% url 'home' %}">
+            <!-- <form method = "post" action = "{% url 'home' %}">
               {% csrf_token %}
               <input class="btn_resume" type="submit" value="Take a Look">
-            </form>
+            </form> -->
 
             <form method = "post" action = "{% url 'presentation' %}">
               {% csrf_token %}
