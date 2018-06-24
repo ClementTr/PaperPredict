@@ -2,6 +2,11 @@
 {% load static %}
 <!DOCTYPE html>
 
+{% block scriptJS %}
+<script type="text/javascript" src="{% static 'newspaper/js/results.js' %}"></script>
+<script type="text/javascript" src="{% static 'newspaper/js/d3.min.js' %}"></script>
+
+{% endblock scriptJS %}
 
 {% block main %}
 <!-- Navigation
@@ -27,16 +32,46 @@
 
 <!-- BODY -->
 <div class="container">
-    <div class="row">
 
-      <h2>RESULTS</h2>
+    <h2>RESULTS</h2>
 
-      <div>
-        <label for="nb_sigma">Nombres de sigma à utiliser: <span id='nb_sigma_value'>0.68</span></label>
-        <input id='nb_sigma' type='range' min='0' max='3' step='0.01' value='0.68'></input>
-      </div>
-
+    <div class='result-header'>
+      <label for="cost_price">Coût par impression: €</label>
+      <input class='small-input' id='cost_price' type='text' value='0.15'></input>
+      <br>
+      <label for="benefit">Bénéfice par vente: €</label>
+      <input class='small-input' id='benefit' type='text' value='1.00'></input>
     </div>
+
+    <div class='result-header'>
+      <label for="nb_sigma"><span id='sigma-text'>Nombres de sigma à utiliser:  </span><span id='nb_sigma_value'></span></label>
+      <div id="popup" style="display: none">
+        La valeur de sigma est un coefficient d'ajout de livraisons en lien avec le risque de rupture de chaque point de ventes (basé sur son historique).
+      </div>
+      <input id='nb_sigma' type='range' min='0' max='3' step='0.01' value='0.68'></input>
+    </div>
+
+
+
+
+    <div class='results_plots'>
+        <div class='plot_container'>GAINS
+          <div class='single_result_plot hover_class' id='roi'></div>
+        </div>
+        <div class='plot_container'>LIVRAISON
+          <div class='single_result_plot hover_class' id='delivered'></div>
+        </div>
+        <div class='plot_container'>VENTES
+          <div class='single_result_plot hover_class' id='sales'></div>
+        </div>              
+        <div class='plot_container'>INVENDUS
+          <div class='single_result_plot hover_class' id='unsales'></div>
+        </div>  
+        <div class='plot_container'>RUPTURES
+          <div class='single_result_plot hover_class' id='ruptures'></div>
+        </div>
+    </div>
+
 
     <form method = "post" action = "{% url 'results' %}">
       {% csrf_token %}
@@ -46,97 +81,186 @@
 {% endblock main %}
 
 {% block d3v4 %}
+<script type="text/javascript">
+  let e = document.getElementById('sigma-text');
+  e.onmouseover = () => document.getElementById('popup').style.display = 'block';
+  e.onmouseout = () => document.getElementById('popup').style.display = 'none';
+
+</script>
+
 
 <script type="text/javascript">
-  console.log("Hello results !");
+
+
+  
+  let cost;
+  let benefit;
+  let sigma;
+  let ruptures_bar;
+  let sales_bar;
+  let delivered_bar;
+  let unsales_bar;
+  let roi_bar;
+
 
   let data;
   $.getJSON("{% static 'newspaper/data/predictions.json' %}", json => {
     data = json;
     console.log(data[0]);
-  });
 
-  let sigma_range = document.getElementById('nb_sigma');
-  console.log(sigma_range);
-  sigma_range.addEventListener('change', e => {
-    let sigma = e.target.value;
-    document.getElementById('nb_sigma_value').innerHTML = sigma;
-    compute_deli(sigma);
+    
 
-    let ruptures = nb_rupture();
-    console.log('Ruptures R/P/O', ruptures.r, ruptures.p, ruptures.o);
-    let sales = nb_sales();
-    console.log('Sales R/P/O', sales.r, sales.p, sales.o);
-    let delivered = nb_delivered();
-    console.log('Delivered R/P/O', delivered.r, delivered.p, delivered.o);
+    const compute_deli = sigma => {
+      data.forEach(d => {
+        d['Delivered_prediction'] = Math.trunc(d.Predictions + +sigma*d.std_gauss);
+      });
+    }
 
-    let unsales = nb_unsales(sales, delivered);
-    console.log('Unsales R/P/O', unsales.r, unsales.p, unsales.o);
-  });
+    const ratio_rupture = () => {
+      let pessimistic = 0;
+      let optimistic = 0;
+      let reality = 0;
 
-  const compute_deli = sigma => {
-    data.forEach(d => {
-      d['Delivered_prediction'] = Math.trunc(d.Predictions + +sigma*d.std_gauss);
+      for (let d of data){
+        if (d.Delivered_prediction <= d.Sales){
+          pessimistic += 1;
+        }
+        if (d.Delivered_prediction <= d.Pot_Sales){
+          optimistic += 1;
+        }
+        if (d.Delivered <= d.Sales){
+          reality += 1;
+        }
+      }
+      return [{'abscisse':'Optimistic', 'height_value':Math.trunc(optimistic/data.length*1000)/10, 'unit':'%'},
+        {'abscisse':'Pessimistic', 'height_value':Math.trunc(pessimistic/data.length*1000)/10, 'unit':'%'},
+        {'abscisse':'Reality', 'height_value':Math.trunc(reality/data.length*1000)/10, 'unit':'%'}];
+    }
+
+    const nb_sales = () => {
+      let pessimistic = 0;
+      let optimistic = 0;
+      let reality = 0;
+
+      for (let d of data){
+        pessimistic += Math.min(d.Delivered_prediction, d.Sales);
+        optimistic += Math.min(d.Delivered_prediction, d.Pot_Sales);
+        reality += d.Sales;
+      }
+
+      return [{'abscisse':'Optimistic', 'height_value':Math.trunc(optimistic/1000), 'unit':'k'},
+        {'abscisse':'Pessimistic', 'height_value':Math.trunc(pessimistic/1000), 'unit':'k'},
+        {'abscisse':'Reality', 'height_value':Math.trunc(reality/1000), 'unit':'k'}];
+    }
+
+    const nb_delivered = () => {
+      let model = 0;
+      let reality = 0;
+
+      for (let d of data){
+        model += d.Delivered_prediction;
+        reality += d.Delivered;
+      }
+      return [{'abscisse':'Optimistic', 'height_value':Math.trunc(model/1000), 'unit':'k'},
+        {'abscisse':'Pessimistic', 'height_value':Math.trunc(model/1000), 'unit':'k'},
+        {'abscisse':'Reality', 'height_value':Math.trunc(reality/1000), 'unit':'k'}];
+    }
+
+    const nb_unsales = () => {
+
+      let pessimistic = 0;
+      let optimistic = 0;
+      let reality = 0;
+
+      for (let d of data){
+        pessimistic += Math.max(d.Delivered_prediction, d.Sales) - Math.min(d.Delivered_prediction, d.Sales);
+        optimistic += Math.max(d.Delivered_prediction, d.Pot_Sales) - Math.min(d.Delivered_prediction, d.Pot_Sales);
+        reality += d.Delivered - d.Sales;
+      }
+
+      return [{'abscisse':'Optimistic', 'height_value':Math.trunc(optimistic/1000), 'unit':'k'},
+        {'abscisse':'Pessimistic', 'height_value':Math.trunc(pessimistic/1000), 'unit':'k'},
+        {'abscisse':'Reality', 'height_value':Math.trunc(reality/1000), 'unit':'k'}];
+    }
+
+
+    const compute_roi = (cost, benefit) => {
+      let pessimistic = 0;
+      let optimistic = 0;
+      let reality = 0;
+
+      for (let d of data){
+        pessimistic += -cost*(d.Delivered_prediction) + benefit*Math.min(d.Delivered_prediction, d.Sales);
+        optimistic += -cost*(d.Delivered_prediction) + benefit*Math.min(d.Delivered_prediction, d.Pot_Sales);
+        reality += -cost*(d.Delivered - d.Sales) + benefit*d.Sales;
+        // pessimistic += -cost*(d.Pot_Sales - Math.min(d.Delivered_prediction, d.Sales)) + benefit*Math.min(d.Delivered_prediction, d.Sales);
+        // optimistic += -cost*(d.Pot_Sales - Math.min(d.Delivered_prediction, d.Pot_Sales)) + benefit*Math.min(d.Delivered_prediction, d.Pot_Sales);
+        // reality += -cost*(d.Delivered - d.Sales) + benefit*d.Sales;
+      }
+
+      return [{'abscisse':'Optimistic', 'height_value':Math.trunc(optimistic/1000), 'unit':'k€'},
+        {'abscisse':'Pessimistic', 'height_value':Math.trunc(pessimistic/1000), 'unit':'k€'},
+        {'abscisse':'Reality', 'height_value':Math.trunc(reality/1000), 'unit':'k€'}];
+    }
+
+    const find_best_sigma = (cost, benefit) => {
+      let best_sigma = 0;
+      let max_roi_opti = 0;
+
+      for (let i=0; i<4; i += 0.1){
+        compute_deli(i);
+        let roi = compute_roi(cost, benefit)[0]['height_value'];
+        if (roi > max_roi_opti){
+          max_roi_opti = roi;
+          best_sigma = i;
+        }
+      }
+      return best_sigma;
+    }
+
+    const update_plots = () => {
+      compute_deli(sigma);
+      ruptures_bar = new BarPlot('ruptures', ratio_rupture(), 'Journaux');
+      sales_bar = new BarPlot('sales', nb_sales(), 'Journaux');
+      delivered_bar = new BarPlot('delivered', nb_delivered(), 'Journaux');
+      unsales_bar = new BarPlot('unsales', nb_unsales(), 'Journaux');
+      roi_bar = new BarPlot('roi', compute_roi(cost, benefit), 'k€   Euros');
+    }
+
+    let cost_entry = document.getElementById('cost_price');
+    cost = +cost_entry.value;
+    cost_entry.addEventListener('change', e => {
+      cost = +cost_entry.value;
+      update_plots();
     });
-  }
 
-  const nb_rupture = () => {
-    let pessimistic = 0;
-    let optimistic = 0;
-    let reality = 0;
-
-    for (let d of data){
-      if (d.Delivered_prediction <= d.Sales){
-        pessimistic += 1;
-      }
-      if (d.Delivered_prediction <= d.Pot_Sales){
-        optimistic += 1;
-      }
-      if (d.Delivered <= d.Sales){
-        reality += 1;
-      }
-    }
-    return {'r':reality/data.length,
-            'o':Math.trunc(optimistic)/data.length,
-            'p':pessimistic/data.length
-          };
-  }
-
-  const nb_sales = () => {
-    let pessimistic = 0;
-    let optimistic = 0;
-    let reality = 0;
-
-    for (let d of data){
-      pessimistic += Math.min(d.Delivered_prediction, d.Sales);
-      optimistic += Math.min(d.Delivered_prediction, d.Pot_Sales);
-      reality += d.Sales;
-    }
-
-    return {'r':reality, 'o':Math.trunc(optimistic), 'p':pessimistic};
-  }
-
-  const nb_delivered = () => {
-    let model = 0;
-    let reality = 0;
-
-    for (let d of data){
-      model += d.Delivered_prediction;
-      reality += d.Delivered;
-    }
-    return {'r':reality, 'o':model, 'p':model};
-  }
-
-  const nb_unsales = (sales, delivered) => {
-    return {'r': delivered.r - sales.r,
-            'o': delivered.o - sales.o,
-            'p': delivered.p - sales.p}
-  }
-
-  // get nb_ rupture
+    let benefit_entry = document.getElementById('benefit');
+    benefit = +benefit_entry.value;
+    benefit_entry.addEventListener('change', e => {
+      benefit = +benefit_entry.value;
+      update_plots();
+    });
 
 
 
 
+
+    let sigma_entry = document.getElementById('nb_sigma');
+    sigma = Math.trunc(find_best_sigma(cost, benefit)*100)/100;
+    sigma_entry.value = sigma;
+    document.getElementById('nb_sigma_value').innerHTML = sigma;
+
+    sigma_entry.addEventListener('change', e => {
+      sigma = e.target.value;
+      document.getElementById('nb_sigma_value').innerHTML = sigma;
+
+      update_plots();
+    });
+
+    update_plots();
+
+  });
+
+  
 </script>
 {% endblock d3v4 %}

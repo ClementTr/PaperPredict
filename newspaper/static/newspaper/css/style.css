@@ -332,3 +332,91 @@ polyline{
     font-size: 0.8em;
     font-style: italic;
 }
+
+
+.result-header {
+	margin-top: 2em;
+}
+
+#nb_sigma_value{
+	font-size: 1.2em;
+    font-style: bold;
+}
+
+.results_plots {
+	padding: 2em;
+	display: flex;
+	align-items: center;
+	justify-content: space-around;
+	flex-wrap: wrap;
+}
+.single_result_plot{
+	background-color: #e5e3e3;
+	margin: 0.5em;
+	min-width: 300px;
+	height: 300px;
+	/*display: flex;*/
+	/*align-items: columns;*/
+
+}
+
+.plot_container{
+	margin-top: 2em;
+	text-align: center;
+}
+
+.result_plot_title {
+	/*font: 1em;*/
+}
+
+.hover_class {
+	transition: ease 0.5s;
+	box-shadow: 0 2px 3px rgba(0,0,0,0.2);
+}
+
+.hover_class:hover {
+	background-color: #f9f9f9;
+ 	border-radius: 1em;
+	box-shadow: 2px 8px 12px rgba(0,0,0,0.3);
+}
+
+.axisGrey line{
+  transition: ease 0.5s;
+  stroke: darkgrey;
+}
+
+.axisGrey path{
+  transition: ease 0.5s;
+  stroke: darkgrey;
+}
+
+.axisGrey text{
+  transition: ease 0.5s;
+  fill: darkgrey;
+}  
+
+.Axis-Label{
+  transition: ease 0.5s;
+  fill: darkgrey;
+}
+
+
+.hover_class:hover .axisGrey line{
+  stroke: black;
+}
+
+.hover_class:hover .axisGrey path{
+  stroke: black;
+}
+
+.hover_class:hover .axisGrey text{
+  fill: black;
+}  
+
+.hover_class:hover .Axis-Label{
+	fill: black;
+}
+
+.small-input{
+    width: 3em;
+}

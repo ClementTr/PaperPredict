@@ -161,14 +161,15 @@ def compute(request):
 def results(request):
     if (request.method == "POST"):
 
-        df_mails = construct_maildf()
-        test= df_mails.loc[[32,3,53,62],:]
-        gmail_user = 'filrouge.newspaper@gmail.com'
-        gmail_password = 'bestteamever'
+        # df_mails = construct_maildf()
+        # test= df_mails.loc[[32,3,53,62],:]
+        # gmail_user = 'filrouge.newspaper@gmail.com'
+        # gmail_password = 'bestteamever'
 
-        for _, row in test.iterrows(): #remplacer test par df_mails pour l'envoyer à tout le monde
-            send_email(row)
+        # for _, row in test.iterrows(): #remplacer test par df_mails pour l'envoyer à tout le monde
+        #     send_email(row)
 
+        fake_send_email()
 
 
         return redirect('/predictor/results')
@@ -178,3 +179,7 @@ def results(request):
     context = {}
 
     return render(request,  'newspaper/results.html', context)
+
+
+def fake_send_email():
+    print('\n\n\nEMAIL SENT\n\n')

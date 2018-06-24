@@ -35,7 +35,7 @@
 
             <div class='input_select_container'>
 
-              <div class='input_select hover_class'>
+              <div class='result-header'>
                 <label for="algorithm">Algorithme de prédiction:</label>
                 <select id="algorithm" name='algorithm'>
                   <option value="RF" selected>Random Forest</option>
@@ -43,11 +43,11 @@
                 </select>
               </div>
 
-              <div class='input_select hover_class'>
+              <div class='result-header'>
                 <label for="start">Date de début:</label>
                 <input type="date" id="start" name="start" min="2016-06-01" max="2016-12-31" value="2016-06-26">
               </div>
-              <div class='input_select hover_class'>
+              <div class='result-header'>
                 <label for="nb_weeks">Nombres de semaine à prédire:</label>
                 <select id="nb_weeks" name='nb_weeks'>
                   <option value="1">1</option>
@@ -60,7 +60,7 @@
             </div>
 
             <div class='input_select_container'>
-              <div class='input_select hover_class'><input type="submit" value="Lancer la prédiction"></div>
+              <div class='result-header'><input type="submit" value="Lancer la prédiction"></div>
             </div>
           </form>
         </div>

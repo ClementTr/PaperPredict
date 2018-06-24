@@ -140,3 +140,5 @@ def send_email(row):
         print('Email sent!')
     except:
         print('Something went wrong...')
+
+
