@@ -30,6 +30,7 @@
 
 {% block main %}
 <!-- BODY -->
+<link href="https://afeld.github.io/emoji-css/emoji.css" rel="stylesheet">
 <div class="row content" style="padding-top: 0px;">
 
   <div class="col-sm-1 sidenav"></div>
@@ -43,11 +44,21 @@
             <th class="col_row_df">Ville</th>
             <th class="col_row_df">Implantation</th>
             <th class="col_row_df">Segment</th>
+            <th class="col_row_df">Ruptures à l'année</th>
+            <th class="col_row_df">État</th>
           </tr>
           {% for line in list_df_values %}
             <tr class="col_row_df">
             {% for c in line %}
+                {% if c == "1" %}
+                <td class="col_row_df">❌</td>
+                {% elif c == "0" %}
+                <td class="col_row_df">⚠️</td>
+                {% elif c == "-1" %}
+                <td class="col_row_df">✅</td>
+                {% else %}
                 <td class="col_row_df">{{c}}</td>
+                {% endif %}
             {% endfor %}
             </tr>
           {% endfor %}

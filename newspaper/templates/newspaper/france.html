@@ -8,6 +8,15 @@
 <script src="{% static 'newspaper/js/jquery.vmap.france.js' %}" type="text/javascript"></script>
 <script src="{% static 'newspaper/js/jquery.vmap.colorsFrance.js' %}" type="text/javascript"></script>
 
+<!-- D3js -->
+<script src="{% static 'newspaper/js/d3.min.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'newspaper/css/multi_lines_chart.css' %}">
+
+<!-- Bootstrap -->
+<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> -->
+
 <script type="text/javascript">
 $(document).ready(function() {
 	$('#francemap').vectorMap({
@@ -68,7 +77,7 @@ $(document).ready(function() {
 
 		<div class="row">
 
-							<div class="col-sm-8">
+							<div class="col-sm-7">
 
 								<div class="au-card m-b-30">
 										<div class="au-card-inner">
@@ -79,7 +88,7 @@ $(document).ready(function() {
 							</div>
 
 
-							<div class="col-sm-4">
+							<div class="col-sm-5">
 
 								<div class="col-sm-12" style=" padding-left: 0px; padding-right: 0px;">
 									<div class="au-card m-b-30" style="padding-left: 20px;padding-bottom: 0px;padding-top: 15px;">
@@ -96,6 +105,7 @@ $(document).ready(function() {
 					                        </optgroup>
 					                      {% endfor %}
 					                    </select>
+															<br>
 					                    <input class="btn_resume" type="submit" value="Aller au département">
 					                  </form>
 					                </center>
@@ -104,12 +114,15 @@ $(document).ready(function() {
 								</div>
 
 								<div class="col-sm-12" style=" padding-left: 0px; padding-right: 0px;">
-									<div class="au-card m-b-30" style="padding-left: 20px;padding-bottom: 0px;padding-top: 15px;">
-											<div class="au-card-inner">
-
-											</div>
-									</div>
-								</div>
+					        <div class="au-card m-b-30" style="padding-left: 20px;padding-bottom: 0px;padding-top: 15px;">
+					            <div class="au-card-inner">
+					              <div class="well">
+													<h5>Ventes et livraisons</h5>
+					                <div class="chart-wrapper" id="chart-line1"></div>
+					              </div>
+					            </div>
+					        </div>
+					      </div>
 
 							</div>
 
@@ -118,3 +131,63 @@ $(document).ready(function() {
 
 </div>
 {% endblock main %}
+
+{% block d3v4 %}
+<!-- MULTI LINES CHART -->
+<script src="{% static 'newspaper/js/departement_multi_lines.js' %}" type="text/javascript"></script>
+<script type="text/javascript">
+  let d3v4 = d3
+  const w = 360, h = 300;
+  const margin = {
+      top: 10,
+      right: 10,
+      bottom: 80,
+      left: 60,
+  };
+  const innerW = w - margin.left - margin.right;
+  const innerH = h - margin.top - margin.bottom;
+
+  //let dataset = [];
+  let x, y;
+  let bisectDate = d3v4.bisector(d => d.date).left;
+
+  //Create SVG element
+  let svg = d3v4.select("#chart-line1")
+      .append("svg")
+      .attr("width", w+40) //Pour afficher les valeurs en fin de courbe
+      .attr("height", h)
+      .attr("id", "depChart")
+      .append("g")
+      .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+  let parseTime = d3v4.timeParse("%Y-%m-%d");
+  let formatTime = d3v4.timeFormat("%Y-%m-%d");
+
+  let svgHTML = document.getElementById("depChart");
+
+  /*DATA LOADER FROM DJANGO*/
+  let data_sales_deliveries = {{ json_france_sales_deliveries|safe }};
+  let data_plot = [];
+  data_sales_deliveries = JSON.parse(data_sales_deliveries);
+
+  data_sales_deliveries.forEach(function(item, index){
+    data_plot.push({
+      "date": parseTime(item["Date"]),
+      "sales": Number(item["Sales"]),
+      "deliveries": Number(item["Delivered"])});
+  });
+
+  if (data_plot.length > 0) {
+		console.log(data_plot)
+       x = d3v4.scaleLinear()
+           .domain(d3v4.extent(data_plot, row => row.date))
+           .range([0, innerW]);
+       y = d3v4.scaleLinear()
+           .domain([0, d3v4.max(data_plot, row => Math.max(row.deliveries, row.sales))])
+           .range([innerH, 0]);
+       draw(data_plot);
+   }
+
+
+</script>
+{% endblock d3v4 %}

@@ -43,8 +43,14 @@ def france(request):
     path_dict_dept = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'static/newspaper/data/dict_departement.pickle')
     with open(path_dict_dept, 'rb') as handle: dict_departement = pickle.load(handle)
 
+    ''' Sales / Deliveries d3'''
+    path_df_france_sales_deliveries = os.path.join(os.path.dirname(os.path.realpath(__file__)), "static/newspaper/data/df_france.csv")
+    df_france_sales_deliveries = pd.read_csv(path_df_france_sales_deliveries, dtype=object)
+    json_france_sales_deliveries = df_france_sales_deliveries.to_json(orient='records')
+    json_france_sales_deliveries = json.dumps(json_france_sales_deliveries)
+
     ''' Contexte '''
-    context = {'dict_regions': dict_regions, 'dict_departement': dict_departement}
+    context = {'dict_regions': dict_regions, 'dict_departement': dict_departement, 'json_france_sales_deliveries': json_france_sales_deliveries}
 
     return render(request, 'newspaper/france.html', context)
 
@@ -128,7 +134,7 @@ def ville(request, code_dept, nom_ville):
     ''' DataFrame Kisoques et Villes '''
     path_df_kioques_villes = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'static/newspaper/data/df_kioques_villes.csv')
     df_kioques_villes = pd.read_csv(path_df_kioques_villes, dtype=object)
-    df_kioques_villes_spec = df_kioques_villes[df_kioques_villes['Ville'] == nom_ville]
+    df_kioques_villes_spec = df_kioques_villes[df_kioques_villes['Ville'] == nom_ville][["Kiosque", "Ville", "Implantation", "Segment", "Ruptures_mean", "Gravity"]]
     list_df_values = []
     for i in range(len(df_kioques_villes_spec)):
         list_df_values.append(df_kioques_villes_spec.iloc[i].tolist())
@@ -138,6 +144,7 @@ def ville(request, code_dept, nom_ville):
     context = {'code_dept': code_dept, 'nom_ville': nom_ville, 'nom_departement': nom_departement,
                'list_df_values': list_df_values}
     return render(request, 'newspaper/ville.html', context)
+
 
 
 def predictor(request):
