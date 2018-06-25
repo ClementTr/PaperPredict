@@ -22,9 +22,10 @@ def load_regressor(path, algo='RF'):
     """
     reg_file = path
 
-    if algo in ['RF', 'AD']:
+    if algo in ['RF', 'AD', 'RIDGE', 'EXTRATREES']:
         reg_file += algo + '.pkl'
         reg = joblib.load(reg_file)
+        print('\n\nModel {} loaded.\n\n'.format(algo))
         return reg
     else:
         print('Algorithm unknown.')
@@ -60,16 +61,11 @@ def construct_maildf():
     mails = f.read()
 
     mails = mails.split(',')
-
     df_mails = pd.DataFrame()
-
-
 
     df_mails['mail']= mails
     df_mails['prenom']=''
     df_mails['nom']= ''
-
-
 
     for i in range(0,len(df_mails)):
         if '<' in df_mails['mail'][i]:
@@ -140,13 +136,6 @@ def send_email(row):
   .bigger { font-size:28 }
    </style>
 
-   <style>
-   /* #logo {
-     position: absolute
-     left: 50px
-     top: 0px
-   } */
-   </style>
 </head>
 
 <body>
@@ -181,14 +170,8 @@ def send_email(row):
             <p>La TEAM: Badr, Yrieix, Baptiste et Clement   </p>
 
           </tr>
-
         </table>
-
-
             </td>
-
-
-
           </tr>
 
         </table>
@@ -196,13 +179,12 @@ def send_email(row):
     </tr>
     <tr>
       <td>
-
       </td>
     </tr>
 
   </table>
 
-</td></tr></table><!-- wrapper -->
+</td></tr></table>
 
 </body>
 </html>
