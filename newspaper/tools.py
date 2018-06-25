@@ -2,6 +2,7 @@ import pandas as pd
 from sklearn.externals import joblib
 import smtplib
 import os
+import email.message
 
 def load_data(start, path):
     """Load the test set.
@@ -112,33 +113,122 @@ def construct_maildf():
 
 
 def send_email(row):
+    server = smtplib.SMTP('smtp.gmail.com:587')
     gmail_user = 'filrouge.newspaper@gmail.com'
     gmail_password = 'bestteamever'
     prenom=row['prenom']
     nom=row['nom']
     sent_from = gmail_user
-    to = row['mail']
-    subject = 'Livraison journaux 25 Juin 2018'
-    body = '''Bonjour %s %s, \n
-    Nous tenons a vous informer qu'au vu de nos previsions, %s journaux seront livres en Ile-de-France \n\n Bonne journee ! '''  % (prenom,nom, '8')
+    email_content = """
+<html>
 
-    email_text = """\
-    From: %s
-    To: %s
-    Subject: %s
+<head>
+<meta http-equiv="Content-Type" content="text/html charset=utf-8">
 
-    %s
-    """ % (sent_from, to, subject, body)
+   <title>Livraison du 26 Juin 2018</title>
+   <style type="text/css">
+    a {color: #d80a3e}
+  body, #header h1, #header h2, p {margin: 0 padding: 0}
+  #main {border: 1px solid #cfcece}
+  img {display: block}
+  #top-message p, #bottom p {color: #3f4042 font-size: 12px font-family: Arial, Helvetica, sans-serif }
+  #header h1 {color: #ffffff !important font-family: "Lucida Grande", sans-serif font-size: 24px margin-bottom: 0!important padding-bottom: 0 }
+  #header p {color: #ffffff !important font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", sans-serif font-size: 12px  }
+  h5 {margin: 0 0 0.8em 0}
+    h5 {font-size: 18px color: #444444 !important font-family: Arial, Helvetica, sans-serif }
+  p {font-size: 12px color: #444444 !important font-family: "Lucida Grande", "Lucida Sans", "Lucida Sans Unicode", sans-serif line-height: 1.5}
+  .bigger { font-size:28 }
+   </style>
 
+   <style>
+   /* #logo {
+     position: absolute
+     left: 50px
+     top: 0px
+   } */
+   </style>
+</head>
+
+<body>
+
+
+<table id="main" width="600" align="center" cellpadding="0" cellspacing="15" bgcolor="ffffff">
+    <tr>
+      <td>
+        <table id="header" cellpadding="10" cellspacing="0" align="center" bgcolor="d80a3e">
+          <tr>
+            <td align="left">  <img id='logo' src="https://gust-production.s3.amazonaws.com/uploads/startup/logo_image/621565/Logo_Transparent_No_Name_Square.png" width="120" height="120"></td>
+            <td width="570" align="left"  bgcolor="#d80a3e"><h1>Bonjour, %s %s  </h1></td>
+          </tr>
+          <tr>
+            <td width="570" align="right" bgcolor="#d80a3e"><p>26 Juin 2018</p></td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <table id="content-3" cellpadding="0" cellspacing="0" align="center">
+          <tr>
+            <table id="content-3" cellpadding="0" cellspacing="0" align="center">
+              <tr>
+
+            <h3>Previsions de ventes:</h3>
+            <p>Pour le 27 Juin 2018, la quantite de journaux a delivrer est de: <span class='bigger'>28</span> .  </p>
+            <p>   </p>
+            <p>Amicalement,   </p>
+            <p>La TEAM: Badr, Yrieix, Baptiste et Clement   </p>
+
+          </tr>
+
+        </table>
+
+
+            </td>
+
+
+
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <td>
+
+      </td>
+    </tr>
+
+  </table>
+
+</td></tr></table><!-- wrapper -->
+
+</body>
+</html>
+
+
+
+"""  % (prenom, nom)
+
+    msg = email.message.Message()
+    msg['Subject'] = 'Prevision de ventes de journaux pour le 26 Juin 2018'
+
+
+
+    password = "bestteamever"
+    msg['From'] = "filrouge.newspaper@gmail.com"
+    msg['To'] = row['mail']
+    msg.add_header('Content-Type', 'text/html')
+    msg.set_payload(email_content)
     try:
-        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-        server.ehlo()
-        server.login(gmail_user, gmail_password)
-        server.sendmail(sent_from, to, email_text)
-        server.close()
+        s = smtplib.SMTP('smtp.gmail.com: 587')
+        s.starttls()
 
-        print('Email sent!')
+        # Login Credentials for sending the mail
+        s.login(msg['From'], password)
+
+        s.sendmail(msg['From'], [msg['To']], msg.as_string())
+        print('Mail envoye a'+prenom+nom)
     except:
-        print('Something went wrong...')
-
-
+        print("Envoie echoue a"+prenom+nom)
