@@ -16,12 +16,7 @@ from .tools import predict, send_email, construct_maildf
 def home(request):
     if (request.method == "POST"):
         return redirect("france/")
-    if (request.method == "POST"):
-        return redirect("presentation/")
     return render(request, 'newspaper/home.html')
-
-def presentation(request):
-    return render(request, 'newspaper/presentation.html')
 
 
 @register.filter

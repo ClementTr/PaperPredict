@@ -2,6 +2,15 @@
 {% load static %}
 
 {% block navigation %}
+<style>
+.center {
+    margin-left: auto;
+    margin-right: auto;
+    display: block
+}
+
+.bar { fill: steelblue; }
+</style>
 <!-- Navigation
 ==========================================-->
 <nav id="tf-menu" class="navbar navbar-default navbar-fixed-top">
@@ -10,7 +19,7 @@
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
         <span class="sr-only">Toggle navigation</span>
       </button>
-      <!-- <a class="navbar-brand" href="/prediction"><font size=3>Newspapers prediction</font></a> -->
+      <!-- <a class="navbar-brand" href="/prediction"><font size=3>newspaper prediction</font></a> -->
     </div>
 
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -31,20 +40,119 @@
 <div id="tf-home" class="text-center">
     <div class="overlay">
         <div class="content">
-            <h1>Welcome on <strong><span class="color">Newspapers prediction</span></strong></h1>
-            <p class="lead">Optimize your distribution</p>
-            <!-- <form method = "post" action = "{% url 'home' %}">
-              {% csrf_token %}
-              <input class="btn_resume" type="submit" value="Take a Look">
-            </form> -->
-
-            <form method = "post" action = "{% url 'presentation' %}">
-              {% csrf_token %}
-              <input class="btn_resume" type="submit" value="Présentation">
-            </form>
+          <h1>Welcome on <strong><span class="color">newspaper prediction</span></strong></h1>
+          <p class="lead">Optimize your distribution</p>
+          <a href="#tf-about" class="fa fa-angle-down page-scroll"></a>
         </div>
     </div>
 </div>
+
+<!-- About Us Page
+==========================================-->
+<div id="tf-about">
+  <div class="container">
+
+  		<div class="row">
+
+  			<div class="col-sm-7">
+  				<div class="au-card m-b-30">
+  						<div class="au-card-inner" style="">
+                <h3 style="padding-bottom: 25px;">Système de livraison des quotidiens</h3>
+                <video class="center" width="600" controls>
+                  <source src="/static/newspaper/img/Distribution.mov" type="video/mp4">
+                </video>
+  						</div>
+  				</div>
+          <div class="au-card m-b-30">
+  						<div class="au-card-inner" style="padding-top: 20px">
+                <div class="well" style="text-align: justify;">
+                  Empiriquement, les éditeurs de presse évaluent les ventes futures pour tous les points de ventes et livrent tous les points de ventes.
+                  L'évaluation des ventes est critique, il faut d'une part eviter le gaspillage et d'autres part éviter les ruptures de stock
+                </div>
+  						</div>
+  				</div>
+  			</div>
+
+  			<div class="col-sm-5">
+  				<div class="col-sm-12" style=" padding-left: 0px; padding-right: 0px;">
+  					<div class="au-card m-b-30" style="padding-left: 20px;padding-bottom: 0px;padding-top: 15px;">
+  							<div class="au-card-inner">
+                  <h5>Répartition des kiosques en fonction de leurs ventes quotidiennes moyennes</h5>
+                  <div class="chart-wrapper" id="barchart"></div>
+  							</div>
+  					</div>
+  				</div>
+  				<div class="col-sm-12" style=" padding-left: 0px; padding-right: 0px;">
+  	        <div class="au-card m-b-30" style="padding-left: 20px;padding-bottom: 0px;padding-top: 15px;">
+  	            <div class="au-card-inner">
+                    › La plupart des points de ventes de France vendent une faible quantité de quotidiens.
+  	            </div>
+  	        </div>
+  	      </div>
+  			</div>
+
+  		</div>
+
+
+  </div>
+</div>
+
+<!-- Team Page
+==========================================-->
+<div id="tf-team" class="text-center">
+    <div class="overlay">
+        <div class="container">
+            <div class="section-title center">
+                <h2>Meet <strong>our team</strong></h2>
+                <div class="line">
+                    <hr>
+                </div>
+            </div>
+
+            <div id="team" class="owl-carousel owl-theme row">
+                <div class="item">
+                    <div class="thumbnail">
+                        <img src="{% static "newspaper/img/team/badr.jpg" %}" alt="..." class="img-circle team-img">
+                        <div class="caption">
+                            <h3 style="color:#FFFFFF">Badr Ghazelan</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="item">
+                    <div class="thumbnail">
+                        <img src="{% static "newspaper/img/team/baptiste.jpeg" %}" alt="..." class="img-circle team-img">
+                        <div class="caption">
+                            <h3 style="color:#FFFFFF">Baptiste Aubert</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="item">
+                    <div class="thumbnail">
+                        <img src="{% static "newspaper/img/team/clement.jpg" %}" alt="..." class="img-circle team-img">
+                        <div class="caption">
+                            <h3 style="color:#FFFFFF">Clément Tailleur</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="item">
+                    <div class="thumbnail">
+                        <img src="{% static "newspaper/img/team/yrieix.jpeg" %}" alt="..." class="img-circle team-img">
+                        <div class="caption">
+                            <h3 style="color:#FFFFFF">Yrieix Leprince</h3>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
 {% endblock main %}
 
 
@@ -57,9 +165,89 @@
         <div class="pull-right fnav">
             <ul class="footer-social">
                 <li><a href="https://www.linkedin.com/in/cl%C3%A9ment-tailleur/" target="_blank"><i class="fab fa-linkedin"></i></a></li>
-                <li><a href="http://clementtailleur.com/" target="_blank"><i class="fab fa-github"></i></a></li>
+                <li><a href="https://github.com/ClementTr" target="_blank"><i class="fab fa-github"></i></a></li>
             </ul>
         </div>
     </div>
 </nav>
 {% endblock footer %}
+
+
+{% block d3v4 %}
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script type="text/javascript" src="{% static "newspaper/js/jquery.1.11.1.js" %}"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script type="text/javascript" src="{% static "newspaper/js/bootstrap.js" %}"></script>
+<script type="text/javascript" src="{% static "newspaper/js/SmoothScroll.js" %}"></script>
+<script type="text/javascript" src="{% static "newspaper/js/jquery.isotope.js" %}"></script>
+
+<script src="{% static "newspaper/js/owl.carousel.js" %}"></script>
+
+<!-- Javascripts
+================================================== -->
+<script type="text/javascript" src="{% static "newspaper/js/main.js" %}"></script>
+
+
+
+<script src="http://d3js.org/d3.v4.min.js"></script>
+<script>
+
+// set the dimensions and margins of the graph
+var margin = {top: 20, right: 20, bottom: 30, left: 40},
+    width = 450 - margin.left - margin.right,
+    height = 300 - margin.top - margin.bottom;
+
+// set the ranges
+var x = d3.scaleBand()
+          .range([0, width])
+          .padding(0.1);
+var y = d3.scaleLinear()
+          .range([height, 0]);
+
+// append the svg object to the body of the page
+// append a 'group' element to 'svg'
+// moves the 'group' element to the top left margin
+var svg = d3.select("#barchart").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+
+// get the data
+d3.csv("/static/newspaper/data/sales.csv", function(error, data) {
+  if (error) throw error;
+
+  // format the data
+  data.forEach(function(d) {
+    d.sales = +d.sales;
+  });
+
+  // Scale the range of the data in the domains
+  x.domain(data.map(function(d) { return d.salesperson; }));
+  y.domain([0, d3.max(data, function(d) { return d.sales; })]);
+
+  // append the rectangles for the bar chart
+  svg.selectAll(".bar")
+      .data(data)
+    .enter().append("rect")
+      .attr("class", "bar_presentation")
+      .attr("x", function(d) { return x(d.salesperson); })
+      .attr("width", x.bandwidth())
+      .attr("y", function(d) { return y(d.sales); })
+      .attr("height", function(d) { return height - y(d.sales); });
+
+  // add the x Axis
+  svg.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x));
+
+  // add the y Axis
+  svg.append("g")
+      .call(d3.axisLeft(y));
+
+});
+
+</script>
+{% endblock d3v4 %}
