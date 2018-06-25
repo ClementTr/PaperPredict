@@ -34,65 +34,91 @@
 <!-- BODY -->
 <div class="container">
 
-    <h2>RESULTS</h2>
+    <div class="row">
 
-    <div class='result-header'>
-      <label for="cost_price">Coût par impression: €</label>
-      <input class='small-input' id='cost_price' type='text' value='0.15'></input>
-      <br>
-      <label for="benefit">Bénéfice par vente: €</label>
-      <input class='small-input' id='benefit' type='text' value='1.00'></input>
-    </div>
+      <h2 style="margin-bottom: 30px">Résultats</h2>
 
-    <div class='result-header'>
-      <label for="nb_sigma"><span id='sigma-text'>Nombres de sigma à utiliser:  </span><span id='nb_sigma_value'></span></label>
-      <div id="popup" style="display: none">
-        La valeur de sigma est un coefficient d'ajout de livraisons en lien avec le risque de rupture de chaque point de ventes (basé sur son historique).
+      <div class="col-sm-3" style="">
+        <div class="au-card m-b-30">
+            <div class="au-card-inner">
+              <div class="well" style="margin-bottom: 0px;height: 90px;">
+                <label for="cost_price" >Coût par impression:</label>
+                <input class='small-input' id='cost_price' type='text' value='0.15'></input>€
+                <br>
+                <label for="benefit" style="padding-bottom: 5px">Bénéfice par vente:&nbsp;&nbsp;</label>
+                <input class='small-input' id='benefit' type='text' value='1.00'></input>€
+              </div>
+            </div>
+        </div>
       </div>
-      <input id='nb_sigma' type='range' min='0' max='3' step='0.01' value='0.68'></input>
+
+      <div class="col-sm-6" style="">
+        <div class="au-card m-b-30">
+            <div class="au-card-inner">
+              <div class="well" style="margin-bottom: 0px; height: 90px;">
+                <label for="nb_sigma"><span id='sigma-text'>Nombres de sigma à utiliser:  </span><span id='nb_sigma_value'></span></label>
+                <div id="popup" style="display: none">
+                  La valeur de sigma est un coefficient d'ajout de livraisons en lien avec le risque de rupture de chaque point de ventes (basé sur son historique).
+                </div>
+                <input id='nb_sigma' type='range' min='0' max='3' step='0.01' value='0.68'></input>
+              </div>
+            </div>
+        </div>
+      </div>
+
+      <div class="col-sm-3" style="">
+        <div class="au-card m-b-30">
+            <div class="au-card-inner">
+              <div class="well" style="margin-bottom: 0px;height: 90px;">
+                <label for="cost_price" >Prévenez vos distributeurs !</label>
+                <center>
+                <form method = "post" action = "{% url 'resultats' %}">
+                  {% csrf_token %}
+                  <input class="btn_mail" type="submit" value="Envoyer mail">
+                </form>
+              </center>
+              </div>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12" style=" padding-left: 0px; padding-right: 0px;">
+        <div class='results_plots' style="padding-top: 0px">
+            <div class='plot_container'>GAINS
+              <div class='single_result_plot hover_class' id='roi'></div>
+            </div>
+            <div class='plot_container'>LIVRAISON
+              <div class='single_result_plot hover_class' id='delivered'></div>
+            </div>
+            <div class='plot_container'>VENTES
+              <div class='single_result_plot hover_class' id='sales'></div>
+            </div>
+            <div class='plot_container'>INVENDUS
+              <div class='single_result_plot hover_class' id='unsales'></div>
+            </div>
+            <div class='plot_container'>RUPTURES
+              <div class='single_result_plot hover_class' id='ruptures'></div>
+            </div>
+        </div>
+    </div>
     </div>
 
 
-
-
-    <div class='results_plots'>
-        <div class='plot_container'>GAINS
-          <div class='single_result_plot hover_class' id='roi'></div>
-        </div>
-        <div class='plot_container'>LIVRAISON
-          <div class='single_result_plot hover_class' id='delivered'></div>
-        </div>
-        <div class='plot_container'>VENTES
-          <div class='single_result_plot hover_class' id='sales'></div>
-        </div>
-        <div class='plot_container'>INVENDUS
-          <div class='single_result_plot hover_class' id='unsales'></div>
-        </div>
-        <div class='plot_container'>RUPTURES
-          <div class='single_result_plot hover_class' id='ruptures'></div>
-        </div>
-    </div>
-
-
-    <form method = "post" action = "{% url 'resultats' %}">
-      {% csrf_token %}
-      <input class="btn_resume" type="submit" value="Send emails">
-    </form>
 </div>
 {% endblock main %}
+
 
 {% block d3v4 %}
 <script type="text/javascript">
   let e = document.getElementById('sigma-text');
   e.onmouseover = () => document.getElementById('popup').style.display = 'block';
   e.onmouseout = () => document.getElementById('popup').style.display = 'none';
-
 </script>
 
 
 <script type="text/javascript">
-
-
 
   let cost;
   let benefit;
@@ -261,7 +287,5 @@
     update_plots();
 
   });
-
-
 </script>
 {% endblock d3v4 %}

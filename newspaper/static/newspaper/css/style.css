@@ -393,7 +393,7 @@ polyline{
 .axisGrey text{
   transition: ease 0.5s;
   fill: darkgrey;
-}  
+}
 
 .Axis-Label{
   transition: ease 0.5s;
@@ -411,7 +411,7 @@ polyline{
 
 .hover_class:hover .axisGrey text{
   fill: black;
-}  
+}
 
 .hover_class:hover .Axis-Label{
 	fill: black;
@@ -419,4 +419,26 @@ polyline{
 
 .small-input{
     width: 3em;
+}
+
+.btn_mail {
+  background: #C6B068;
+  color: #292828;
+  padding: 1px 10px;
+  text-transform: uppercase;
+  font-size: 12px;
+  margin-bottom: 0px;
+  margin-top: 0px;
+  display: inline-block;
+  border-radius: 2px;
+  box-shadow: 0 1px 3px -1px rgba(0, 0, 0, 0.6);
+}
+.btn_mail:hover {
+  background: #292828;
+  color: #FFFFFF;
+  text-decoration: none;
+}
+.btn_mail:focus {
+	text-decoration: none;
+	color: #292828;
 }
