@@ -12,7 +12,7 @@ class BarPlot{
 		this.data = data;
 
 		this.y_label = y_label;
-		this.colors = ['#B3001B', '#262626', '#255C99'];
+		this.colors = ['#ACBEA3', '#40476D', '#826754'];
 
 		this.instantiateSVG();
 		this.instantiateBar();
