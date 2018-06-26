@@ -32,24 +32,48 @@ def load_regressor(path, algo='RF'):
 
 
 
+# def predict(path, algo, start, nb_weeks):
+
+#     path += '/static/newspaper/data/'
+#     x_test = pd.read_pickle(path + 'x_test.pkl')
+#     reg = load_regressor(path, algo)
+#     y_pred = reg.predict(x_test)
+
+#     del x_test, reg
+
+#     y_test = pd.read_pickle(path + 'y_test.pkl')
+#     y_test['Predictions'] = y_pred
+
+#     end_date = pd.to_datetime(start) + pd.Timedelta(int(nb_weeks)*7, unit='d')
+
+#     y_test = y_test #[:end_date]
+
+#     y_test.to_json(path + 'predictions.json', orient='records')
+#     return True
+
 def predict(path, algo, start, nb_weeks):
 
     path += '/static/newspaper/data/'
     x_test = pd.read_pickle(path + 'x_test.pkl')
-    reg = load_regressor(path, algo)
-    y_pred = reg.predict(x_test)
+    final_results = pd.read_pickle(path + 'final_results.pkl')
 
-    del x_test, reg
+    clf = load_regressor(path, algo)
 
-    y_test = pd.read_pickle(path + 'y_test.pkl')
-    y_test['Predictions'] = y_pred
+    X_pred = clf.predict(x_test) 
 
-    end_date = pd.to_datetime(start) + pd.Timedelta(int(nb_weeks)*7, unit='d')
+    X_pred_df = pd.DataFrame(X_pred, index = x_test.index)
+    X_pred_df.columns = ['Predictions']
+    X_pred_df['Delivered'] = final_results.Delivered.values
+    X_pred_df['Sales'] = final_results.Sales.values
+    X_pred_df['Pot_Sales'] = final_results.Pot_Sales.values
 
-    y_test = y_test[:end_date]
+    stds_df = pd.read_pickle(path + 'stds_df.pkl')
 
-    y_test.to_json(path + 'predictions.json', orient='records')
+    X_pred_risk = pd.merge(X_pred_df.reset_index(), stds_df, on='Kiosque') 
+
+    X_pred_risk.to_json(path + 'predictions.json', orient='records')
     return True
+
 
 
 
