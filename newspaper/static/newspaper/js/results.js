@@ -1,5 +1,5 @@
 class BarPlot{
-	/** 
+	/**
 	* BarPlot Constructor
 	* @param id the div id in which we draw the BarPlot
 	* @param data
@@ -12,7 +12,7 @@ class BarPlot{
 		this.data = data;
 
 		this.y_label = y_label;
-		this.colors = ['#afaf00', '#1368f2', '#00c69f'];
+		this.colors = ['#B3001B', '#262626', '#255C99'];
 
 		this.instantiateSVG();
 		this.instantiateBar();
@@ -37,7 +37,7 @@ class BarPlot{
 		this.innerWidth = this.width - (this.margin.right + this.margin.left);
 		this.innerHeight = this.height - (this.margin.top + this.margin.bottom);
 
-	}	
+	}
 
 	instantiateBar(){
 		// create x axis
@@ -48,7 +48,7 @@ class BarPlot{
 					.range([this.innerHeight, 0]);
 
 		this.g = this.svg.append('g')
-				.attr('transform', 'translate(' + this.margin.left 
+				.attr('transform', 'translate(' + this.margin.left
 									+ ',' + this.margin.top +')');
 
 		this.x.domain(this.data.map(d => d.abscisse));
@@ -73,7 +73,7 @@ class BarPlot{
 		  .attr("x",10 - (this.innerHeight / 2))
 		  .attr("dy", "1em")
 		  .style("text-anchor", "middle")
-		  .text(this.y_label);  
+		  .text(this.y_label);
 
 
 		this.g.selectAll(".bar")
