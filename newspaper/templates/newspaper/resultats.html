@@ -174,7 +174,7 @@
 
     const compute_deli = sigma => {
       data.forEach(d => {
-        d['Delivered_prediction'] = Math.trunc(d.Predictions + +sigma*d.std_gauss);
+        d['Delivered_prediction'] = Math.trunc(d.Predictions + +sigma*d.std);
       });
     }
 
@@ -184,19 +184,13 @@
       let reality = 0;
 
       for (let d of data){
-        if (d.Delivered_prediction <= d.Sales){
-          pessimistic += 1;
-        }
-        if (d.Delivered_prediction <= d.Pot_Sales){
-          optimistic += 1;
-        }
-        if (d.Delivered <= d.Sales){
-          reality += 1;
-        }
+          pessimistic += (d.Delivered_prediction <= d.Sales);
+          optimistic += (d.Delivered_prediction <= d.Pot_Sales);
+          reality += (d.Delivered <= d.Sales);
       }
-      return [{'abscisse':'Optimistic', 'height_value':Math.trunc(optimistic/data.length*1000)/10, 'unit':'%'},
-        {'abscisse':'Pessimistic', 'height_value':Math.trunc(pessimistic/data.length*1000)/10, 'unit':'%'},
-        {'abscisse':'Reality', 'height_value':Math.trunc(reality/data.length*1000)/10, 'unit':'%'}];
+      return [{'abscisse':'Reality', 'height_value':Math.trunc(reality/data.length*1000)/10, 'unit':'%'}, 
+        {'abscisse':'Optimistic', 'height_value':Math.trunc(optimistic/data.length*1000)/10, 'unit':'%'},
+        {'abscisse':'Pessimistic', 'height_value':Math.trunc(pessimistic/data.length*1000)/10, 'unit':'%'}];
     }
 
     const nb_sales = () => {
@@ -210,9 +204,9 @@
         reality += d.Sales;
       }
 
-      return [{'abscisse':'Optimistic', 'height_value':Math.trunc(optimistic/1000), 'unit':'k'},
-        {'abscisse':'Pessimistic', 'height_value':Math.trunc(pessimistic/1000), 'unit':'k'},
-        {'abscisse':'Reality', 'height_value':Math.trunc(reality/1000), 'unit':'k'}];
+      return [{'abscisse':'Reality', 'height_value':Math.trunc(reality/1000), 'unit':'k'},
+        {'abscisse':'Optimistic', 'height_value':Math.trunc(optimistic/1000), 'unit':'k'},
+        {'abscisse':'Pessimistic', 'height_value':Math.trunc(pessimistic/1000), 'unit':'k'}];
     }
 
     const nb_delivered = () => {
@@ -223,9 +217,9 @@
         model += d.Delivered_prediction;
         reality += d.Delivered;
       }
-      return [{'abscisse':'Optimistic', 'height_value':Math.trunc(model/1000), 'unit':'k'},
-        {'abscisse':'Pessimistic', 'height_value':Math.trunc(model/1000), 'unit':'k'},
-        {'abscisse':'Reality', 'height_value':Math.trunc(reality/1000), 'unit':'k'}];
+      return [{'abscisse':'Reality', 'height_value':Math.trunc(reality/1000), 'unit':'k'},
+        {'abscisse':'Optimistic', 'height_value':Math.trunc(model/1000), 'unit':'k'},
+        {'abscisse':'Pessimistic', 'height_value':Math.trunc(model/1000), 'unit':'k'}];
     }
 
     const nb_unsales = () => {
@@ -240,9 +234,9 @@
         reality += d.Delivered - d.Sales;
       }
 
-      return [{'abscisse':'Optimistic', 'height_value':Math.trunc(optimistic/1000), 'unit':'k'},
-        {'abscisse':'Pessimistic', 'height_value':Math.trunc(pessimistic/1000), 'unit':'k'},
-        {'abscisse':'Reality', 'height_value':Math.trunc(reality/1000), 'unit':'k'}];
+      return [{'abscisse':'Reality', 'height_value':Math.trunc(reality/1000), 'unit':'k'},
+        {'abscisse':'Optimistic', 'height_value':Math.trunc(optimistic/1000), 'unit':'k'},
+        {'abscisse':'Pessimistic', 'height_value':Math.trunc(pessimistic/1000), 'unit':'k'}];
     }
 
 
@@ -252,17 +246,17 @@
       let reality = 0;
 
       for (let d of data){
-        pessimistic += -cost*(d.Delivered_prediction) + benefit*Math.min(d.Delivered_prediction, d.Sales);
-        optimistic += -cost*(d.Delivered_prediction) + benefit*Math.min(d.Delivered_prediction, d.Pot_Sales);
-        reality += -cost*(d.Delivered - d.Sales) + benefit*d.Sales;
-        pessimistic += -cost*(d.Pot_Sales - Math.min(d.Delivered_prediction, d.Sales)) + benefit*Math.min(d.Delivered_prediction, d.Sales);
-        optimistic += -cost*(d.Pot_Sales - Math.min(d.Delivered_prediction, d.Pot_Sales)) + benefit*Math.min(d.Delivered_prediction, d.Pot_Sales);
-        reality += -cost*(d.Delivered - d.Sales) + benefit*d.Sales;
+        // pessimistic += -cost*(d.Delivered_prediction) + benefit*Math.min(d.Delivered_prediction, d.Sales);
+        // optimistic += -cost*(d.Delivered_prediction) + benefit*Math.min(d.Delivered_prediction, d.Pot_Sales);
+        // reality += -cost*(d.Delivered - d.Sales) + benefit*d.Sales;
+        pessimistic += -cost*d.Delivered_prediction + benefit*Math.min(d.Delivered_prediction, d.Sales);
+        optimistic += -cost*d.Delivered_prediction + benefit*Math.min(d.Delivered_prediction, d.Pot_Sales);
+        reality += -cost*(d.Delivered) + benefit*d.Sales;
       }
 
-      return [{'abscisse':'Optimistic', 'height_value':Math.trunc(optimistic/1000), 'unit':'k€'},
-        {'abscisse':'Pessimistic', 'height_value':Math.trunc(pessimistic/1000), 'unit':'k€'},
-        {'abscisse':'Reality', 'height_value':Math.trunc(reality/1000), 'unit':'k€'}];
+      return [{'abscisse':'Reality', 'height_value':Math.trunc(reality/1000), 'unit':'k€'},
+        {'abscisse':'Optimistic', 'height_value':Math.trunc(optimistic/1000), 'unit':'k€'},
+        {'abscisse':'Pessimistic', 'height_value':Math.trunc(pessimistic/1000), 'unit':'k€'}];
     }
 
     const find_best_sigma = (cost, benefit) => {
@@ -271,7 +265,7 @@
 
       for (let i=0; i<4; i += 0.1){
         compute_deli(i);
-        let roi = compute_roi(cost, benefit)[0]['height_value'];
+        let roi = compute_roi(cost, benefit)[1]['height_value'];
         if (roi > max_roi_opti){
           max_roi_opti = roi;
           best_sigma = i;
