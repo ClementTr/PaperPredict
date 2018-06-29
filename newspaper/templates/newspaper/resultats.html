@@ -85,18 +85,28 @@
 
     <div class="row">
 
-      <div class="col-sm-6">
+      <div class="col-sm-4">
         <div class="au-card m-b-30">
             <div class="au-card-inner">
               <div class='well' style="margin-top: 20px;">
-                <h5>Gains</h5>
+                <h5>ROI</h5>
                 <div class='single_result_plot hover_class' id='roi'></div>
               </div>
             </div>
         </div>
       </div>
 
-      <div class="col-sm-6">
+      <div class="col-sm-4">
+        <div class="au-card m-b-30">
+            <div class="au-card-inner">
+              <div class='well' style="margin-top: 20px;">
+                <h5>Chiffre d'affaire</h5>
+                <div class='single_result_plot hover_class' id='ca'></div>
+              </div>
+            </div>
+        </div>
+      </div>
+      <div class="col-sm-4">
         <div class="au-card m-b-30">
             <div class="au-card-inner">
               <div class='well' style="margin-top: 20px;">
@@ -167,6 +177,7 @@
   let delivered_bar;
   let unsales_bar;
   let roi_bar;
+  let ca_bar;
 
 
   let data;
@@ -253,6 +264,26 @@
         // pessimistic += -cost*(d.Delivered_prediction) + benefit*Math.min(d.Delivered_prediction, d.Sales);
         // optimistic += -cost*(d.Delivered_prediction) + benefit*Math.min(d.Delivered_prediction, d.Pot_Sales);
         // reality += -cost*(d.Delivered - d.Sales) + benefit*d.Sales;
+        pessimistic += -cost*(d.Delivered_prediction - Math.min(d.Delivered_prediction, d.Sales))+ benefit*Math.min(d.Delivered_prediction, d.Sales);
+        optimistic += -cost*(d.Delivered_prediction - Math.min(d.Delivered_prediction, d.Pot_Sales))+ benefit*Math.min(d.Delivered_prediction, d.Pot_Sales);
+        reality += -cost*(d.Delivered - d.Sales) + benefit*d.Sales;
+      }
+
+      return [{'abscisse':'Reality', 'height_value':Math.trunc(reality/1000), 'unit':'k€'},
+        {'abscisse':'Optimistic', 'height_value':Math.trunc(optimistic/1000), 'unit':'k€'},
+        {'abscisse':'Pessimistic', 'height_value':Math.trunc(pessimistic/1000), 'unit':'k€'}];
+    }
+
+  // Chiffre d'affaire
+    const compute_ca = (cost, benefit) => {
+      let pessimistic = 0;
+      let optimistic = 0;
+      let reality = 0;
+
+      for (let d of data){
+        // pessimistic += -cost*(d.Delivered_prediction) + benefit*Math.min(d.Delivered_prediction, d.Sales);
+        // optimistic += -cost*(d.Delivered_prediction) + benefit*Math.min(d.Delivered_prediction, d.Pot_Sales);
+        // reality += -cost*(d.Delivered - d.Sales) + benefit*d.Sales;
         pessimistic += -cost*d.Delivered_prediction + benefit*Math.min(d.Delivered_prediction, d.Sales);
         optimistic += -cost*d.Delivered_prediction + benefit*Math.min(d.Delivered_prediction, d.Pot_Sales);
         reality += -cost*(d.Delivered) + benefit*d.Sales;
@@ -262,6 +293,8 @@
         {'abscisse':'Optimistic', 'height_value':Math.trunc(optimistic/1000), 'unit':'k€'},
         {'abscisse':'Pessimistic', 'height_value':Math.trunc(pessimistic/1000), 'unit':'k€'}];
     }
+
+
 
     const find_best_sigma = (cost, benefit) => {
       let best_sigma = 0;
