@@ -245,13 +245,14 @@
           // reality += (d.Delivered <= d.Sales);
 
           //Formule de Badr:
+          // Selon cette formule, on n'a une rupture QUE lorsque le nombre
+          // de journaux livrés est STRICTEMENT égal au nombre de ventes.
+          // DONC si on livre 0 journal sur toute la France, on a pas 100% de ruptures... Il n'y aura rupture que dans les kiosques sans ventes...
           pessimistic += (d.Delivered_prediction === d.Sales);
           optimistic += (d.Delivered_prediction === d.Pot_Sales);
           reality += (d.Delivered === d.Sales);
-
-
-
       }
+
       return [{'abscisse':'Reality', 'height_value':Math.trunc(reality/1000), 'unit':'k'}, 
         {'abscisse':'Optimistic', 'height_value':Math.trunc(optimistic/1000), 'unit':'k'},
         {'abscisse':'Pessimistic', 'height_value':Math.trunc(pessimistic/1000), 'unit':'k'}];
