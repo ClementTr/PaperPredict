@@ -100,8 +100,8 @@
         <div class="au-card m-b-30">
             <div class="au-card-inner">
               <div class='well' style="margin-top: 20px;">
-                <h5>VAZ</h5>
-                <div class='single_result_plot hover_class' id='vaz'></div>
+                <h5>Chiffre d'affaire</h5>
+                <div class='single_result_plot hover_class' id='ca'></div>
               </div>
             </div>
         </div>
@@ -111,12 +111,14 @@
         <div class="au-card m-b-30">
             <div class="au-card-inner">
               <div class='well' style="margin-top: 20px;">
-                <h5>Chiffre d'affaire</h5>
-                <div class='single_result_plot hover_class' id='ca'></div>
+                <h5>VAZ</h5>
+                <div class='single_result_plot hover_class' id='vaz'></div>
               </div>
             </div>
         </div>
       </div>
+
+
       <div class="col-sm-4">
         <div class="au-card m-b-30">
             <div class="au-card-inner">
@@ -201,6 +203,7 @@
   let unsales_bar;
   let roi_bar;
   let ca_bar;
+  let vaz_bar;
 
 
   let data;
@@ -319,9 +322,6 @@
       let reality = 0;
 
       for (let d of data){
-        // pessimistic += -cost*(d.Delivered_prediction) + benefit*Math.min(d.Delivered_prediction, d.Sales);
-        // optimistic += -cost*(d.Delivered_prediction) + benefit*Math.min(d.Delivered_prediction, d.Pot_Sales);
-        // reality += -cost*(d.Delivered - d.Sales) + benefit*d.Sales;
         pessimistic += -cost*d.Delivered_prediction + benefit*Math.min(d.Delivered_prediction, d.Sales);
         optimistic += -cost*d.Delivered_prediction + benefit*Math.min(d.Delivered_prediction, d.Pot_Sales);
         reality += -cost*(d.Delivered) + benefit*d.Sales;
@@ -330,6 +330,36 @@
       return [{'abscisse':'Reality', 'height_value':Math.trunc(reality/1000), 'unit':'k€'},
         {'abscisse':'Optimistic', 'height_value':Math.trunc(optimistic/1000), 'unit':'k€'},
         {'abscisse':'Pessimistic', 'height_value':Math.trunc(pessimistic/1000), 'unit':'k€'}];
+    }
+
+  // VAZ
+    const compute_vaz = () => {
+
+      // faire la somme des ventes
+      // compter le nombre de ruptures et le diviser par la somme des ventes
+
+      let pessimistic = 0;
+      let optimistic = 0;
+      let reality = 0;
+
+      let sum_pes_sales = 0;
+      let sum_opt_sales = 0;
+      let sum_sales = 0;
+
+      for (let d of data){
+        sum_pes_sales += Math.min(d.Delivered_prediction, d.Sales);
+        sum_opt_sales += Math.min(d.Delivered_prediction, d.Pot_Sales);
+        sum_sales += d.Sales;
+
+
+        pessimistic += +(d.Delivered_prediction === Math.min(d.Delivered_prediction, d.Sales));
+        optimistic += +(d.Delivered_prediction === Math.min(d.Delivered_prediction, d.Pot_Sales));
+        reality += +(d.Delivered === d.Sales);
+      }
+
+      return [{'abscisse':'Reality', 'height_value':Math.trunc(reality/sum_sales*100)/100, 'unit':''},
+        {'abscisse':'Optimistic', 'height_value':Math.trunc(optimistic/sum_opt_sales*100)/100, 'unit':''},
+        {'abscisse':'Pessimistic', 'height_value':Math.trunc(pessimistic/sum_pes_sales*100)/100, 'unit':''}];
     }
 
 
@@ -358,6 +388,7 @@
       unsales_bar = new BarPlot('unsales', nb_unsales(), 'Journaux');
       roi_bar = new BarPlot('roi', compute_roi(cost, benefit), 'k€   Euros');
       ca_bar = new BarPlot('ca', compute_ca(cost, benefit), 'k€ Euros');
+      vaz_bar = new BarPlot('vaz', compute_vaz(), '');
     }
 
     let cost_entry = document.getElementById('cost_price');
