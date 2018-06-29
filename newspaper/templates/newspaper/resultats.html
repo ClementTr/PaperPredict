@@ -57,9 +57,9 @@
             <div class="au-card-inner">
               <div class="well" style="margin-bottom: 0px; height: 90px;">
                 <label for="nb_sigma"><span id='sigma-text'>Nombres de sigma à utiliser:  </span><span id='nb_sigma_value'></span></label>
-                <!-- <div id="popup" style="display: none">
-                  La valeur de sigma est un coefficient d'ajout de livraisons en lien avec le risque de rupture de chaque point de ventes (basé sur son historique).
-                </div> -->
+                <div id="popup" style="display: none">
+                  Coefficient de risque de rupture (basé sur l'historique de chaque point de ventes).
+                </div>
                 <input id='nb_sigma' type='range' min='0' max='3' step='0.01' value='0.68'></input>
               </div>
             </div>
@@ -150,6 +150,10 @@
   let e = document.getElementById('sigma-text');
   e.onmouseover = () => document.getElementById('popup').style.display = 'block';
   e.onmouseout = () => document.getElementById('popup').style.display = 'none';
+
+
+
+
 </script>
 
 
@@ -305,6 +309,24 @@
     sigma = Math.trunc(find_best_sigma(cost, benefit)*100)/100;
     sigma_entry.value = sigma;
     document.getElementById('nb_sigma_value').innerHTML = sigma;
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'a') {
+        if (sigma < 2.98){
+          sigma = +document.getElementById('nb_sigma').value + 0.03;
+        }
+      } else if (event.key === 'z') {
+        if (sigma > 0.02){
+          sigma = +document.getElementById('nb_sigma').value - 0.03;
+        }
+      }
+
+      document.getElementById('nb_sigma').value = sigma ;
+      document.getElementById('nb_sigma_value').innerHTML = Math.trunc(sigma*100)/100;
+      update_plots();
+
+    }, false);
+
 
     sigma_entry.addEventListener('change', e => {
       sigma = e.target.value;
