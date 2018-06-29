@@ -318,6 +318,7 @@
       delivered_bar = new BarPlot('delivered', nb_delivered(), 'Journaux');
       unsales_bar = new BarPlot('unsales', nb_unsales(), 'Journaux');
       roi_bar = new BarPlot('roi', compute_roi(cost, benefit), 'k€   Euros');
+      ca_bar = new BarPlot('ca', compute_ca(cost, benefit), 'k€ Euros');
     }
 
     let cost_entry = document.getElementById('cost_price');
