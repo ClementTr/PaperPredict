@@ -240,9 +240,17 @@
       let reality = 0;
 
       for (let d of data){
-          pessimistic += (d.Delivered_prediction <= d.Sales);
-          optimistic += (d.Delivered_prediction <= d.Pot_Sales);
-          reality += (d.Delivered <= d.Sales);
+          // pessimistic += (d.Delivered_prediction <= d.Sales);
+          // optimistic += (d.Delivered_prediction <= d.Pot_Sales);
+          // reality += (d.Delivered <= d.Sales);
+
+          //Formule de Badr:
+          pessimistic += (d.Delivered_prediction === d.Sales);
+          optimistic += (d.Delivered_prediction === d.Pot_Sales);
+          reality += (d.Delivered === d.Sales);
+
+
+
       }
       return [{'abscisse':'Reality', 'height_value':Math.trunc(reality/1000), 'unit':'k'}, 
         {'abscisse':'Optimistic', 'height_value':Math.trunc(optimistic/1000), 'unit':'k'},
@@ -381,14 +389,16 @@
 
     const update_plots = () => {
       compute_deli(sigma);
-      ruptures_ratio_bar = new BarPlot('rupture_ratio', ratio_rupture(), '%');
-      ruptures_bar = new BarPlot('ruptures', nb_ruptures(), 'Points de ventes');
-      sales_bar = new BarPlot('sales', nb_sales(), 'Journaux');
-      delivered_bar = new BarPlot('delivered', nb_delivered(), 'Journaux');
-      unsales_bar = new BarPlot('unsales', nb_unsales(), 'Journaux');
       roi_bar = new BarPlot('roi', compute_roi(cost, benefit), 'k€   Euros');
       ca_bar = new BarPlot('ca', compute_ca(cost, benefit), 'k€ Euros');
       vaz_bar = new BarPlot('vaz', compute_vaz(), '');
+
+      delivered_bar = new BarPlot('delivered', nb_delivered(), 'Journaux');
+      sales_bar = new BarPlot('sales', nb_sales(), 'Journaux');
+      unsales_bar = new BarPlot('unsales', nb_unsales(), 'Journaux');
+      
+      ruptures_ratio_bar = new BarPlot('rupture_ratio', ratio_rupture(), '%');
+      ruptures_bar = new BarPlot('ruptures', nb_ruptures(), 'Points de ventes (x1000)');
     }
 
     let cost_entry = document.getElementById('cost_price');
