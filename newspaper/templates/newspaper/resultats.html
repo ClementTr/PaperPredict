@@ -100,6 +100,17 @@
         <div class="au-card m-b-30">
             <div class="au-card-inner">
               <div class='well' style="margin-top: 20px;">
+                <h5>VAZ</h5>
+                <div class='single_result_plot hover_class' id='vaz'></div>
+              </div>
+            </div>
+        </div>
+      </div>
+
+      <div class="col-sm-4">
+        <div class="au-card m-b-30">
+            <div class="au-card-inner">
+              <div class='well' style="margin-top: 20px;">
                 <h5>Chiffre d'affaire</h5>
                 <div class='single_result_plot hover_class' id='ca'></div>
               </div>
@@ -141,6 +152,17 @@
         <div class="au-card m-b-30">
             <div class="au-card-inner">
               <div class='well' style="margin-top: 20px;">
+                <h5>Ruptures Ratio</h5>
+                <div class='single_result_plot hover_class' id='rupture_ratio'></div>
+              </div>
+            </div>
+        </div>
+      </div>
+
+      <div class="col-sm-4">
+        <div class="au-card m-b-30">
+            <div class="au-card-inner">
+              <div class='well' style="margin-top: 20px;">
                 <h5>Ruptures</h5>
                 <div class='single_result_plot hover_class' id='ruptures'></div>
               </div>
@@ -173,6 +195,7 @@
   let benefit;
   let sigma;
   let ruptures_bar;
+  let ruptures_ratio_bar;
   let sales_bar;
   let delivered_bar;
   let unsales_bar;
@@ -206,6 +229,21 @@
       return [{'abscisse':'Reality', 'height_value':Math.trunc(reality/data.length*1000)/10, 'unit':'%'}, 
         {'abscisse':'Optimistic', 'height_value':Math.trunc(optimistic/data.length*1000)/10, 'unit':'%'},
         {'abscisse':'Pessimistic', 'height_value':Math.trunc(pessimistic/data.length*1000)/10, 'unit':'%'}];
+    }
+
+    const nb_ruptures = () => {
+      let pessimistic = 0;
+      let optimistic = 0;
+      let reality = 0;
+
+      for (let d of data){
+          pessimistic += (d.Delivered_prediction <= d.Sales);
+          optimistic += (d.Delivered_prediction <= d.Pot_Sales);
+          reality += (d.Delivered <= d.Sales);
+      }
+      return [{'abscisse':'Reality', 'height_value':Math.trunc(reality/1000), 'unit':'k'}, 
+        {'abscisse':'Optimistic', 'height_value':Math.trunc(optimistic/1000), 'unit':'k'},
+        {'abscisse':'Pessimistic', 'height_value':Math.trunc(pessimistic/1000), 'unit':'k'}];
     }
 
     const nb_sales = () => {
@@ -313,7 +351,8 @@
 
     const update_plots = () => {
       compute_deli(sigma);
-      ruptures_bar = new BarPlot('ruptures', ratio_rupture(), 'Journaux');
+      ruptures_ratio_bar = new BarPlot('rupture_ratio', ratio_rupture(), '%');
+      ruptures_bar = new BarPlot('ruptures', nb_ruptures(), 'Points de ventes');
       sales_bar = new BarPlot('sales', nb_sales(), 'Journaux');
       delivered_bar = new BarPlot('delivered', nb_delivered(), 'Journaux');
       unsales_bar = new BarPlot('unsales', nb_unsales(), 'Journaux');
