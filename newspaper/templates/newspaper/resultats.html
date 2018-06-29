@@ -85,18 +85,41 @@
 
     <div class="row">
 
-      <div class="col-sm-6">
+      <div class="col-sm-4">
         <div class="au-card m-b-30">
             <div class="au-card-inner">
               <div class='well' style="margin-top: 20px;">
-                <h5>Gains</h5>
+                <h5>ROI</h5>
                 <div class='single_result_plot hover_class' id='roi'></div>
               </div>
             </div>
         </div>
       </div>
 
-      <div class="col-sm-6">
+      <div class="col-sm-4">
+        <div class="au-card m-b-30">
+            <div class="au-card-inner">
+              <div class='well' style="margin-top: 20px;">
+                <h5>Chiffre d'affaire</h5>
+                <div class='single_result_plot hover_class' id='ca'></div>
+              </div>
+            </div>
+        </div>
+      </div>
+
+      <div class="col-sm-4">
+        <div class="au-card m-b-30">
+            <div class="au-card-inner">
+              <div class='well' style="margin-top: 20px;">
+                <h5>VAZ</h5>
+                <div class='single_result_plot hover_class' id='vaz'></div>
+              </div>
+            </div>
+        </div>
+      </div>
+
+
+      <div class="col-sm-4">
         <div class="au-card m-b-30">
             <div class="au-card-inner">
               <div class='well' style="margin-top: 20px;">
@@ -124,6 +147,17 @@
             <h5>Invendus</h5>
             <div class='single_result_plot hover_class' id='unsales'></div>
           </div>
+        </div>
+      </div>
+
+      <div class="col-sm-4">
+        <div class="au-card m-b-30">
+            <div class="au-card-inner">
+              <div class='well' style="margin-top: 20px;">
+                <h5>Ruptures Ratio</h5>
+                <div class='single_result_plot hover_class' id='rupture_ratio'></div>
+              </div>
+            </div>
         </div>
       </div>
 
@@ -163,10 +197,13 @@
   let benefit;
   let sigma;
   let ruptures_bar;
+  let ruptures_ratio_bar;
   let sales_bar;
   let delivered_bar;
   let unsales_bar;
   let roi_bar;
+  let ca_bar;
+  let vaz_bar;
 
 
   let data;
@@ -195,6 +232,29 @@
       return [{'abscisse':'Reality', 'height_value':Math.trunc(reality/data.length*1000)/10, 'unit':'%'}, 
         {'abscisse':'Optimistic', 'height_value':Math.trunc(optimistic/data.length*1000)/10, 'unit':'%'},
         {'abscisse':'Pessimistic', 'height_value':Math.trunc(pessimistic/data.length*1000)/10, 'unit':'%'}];
+    }
+
+    const nb_ruptures = () => {
+      let pessimistic = 0;
+      let optimistic = 0;
+      let reality = 0;
+
+      for (let d of data){
+          // pessimistic += (d.Delivered_prediction <= d.Sales);
+          // optimistic += (d.Delivered_prediction <= d.Pot_Sales);
+          // reality += (d.Delivered <= d.Sales);
+
+          //Formule de Badr:
+          pessimistic += (d.Delivered_prediction === d.Sales);
+          optimistic += (d.Delivered_prediction === d.Pot_Sales);
+          reality += (d.Delivered === d.Sales);
+
+
+
+      }
+      return [{'abscisse':'Reality', 'height_value':Math.trunc(reality/1000), 'unit':'k'}, 
+        {'abscisse':'Optimistic', 'height_value':Math.trunc(optimistic/1000), 'unit':'k'},
+        {'abscisse':'Pessimistic', 'height_value':Math.trunc(pessimistic/1000), 'unit':'k'}];
     }
 
     const nb_sales = () => {
@@ -253,6 +313,23 @@
         // pessimistic += -cost*(d.Delivered_prediction) + benefit*Math.min(d.Delivered_prediction, d.Sales);
         // optimistic += -cost*(d.Delivered_prediction) + benefit*Math.min(d.Delivered_prediction, d.Pot_Sales);
         // reality += -cost*(d.Delivered - d.Sales) + benefit*d.Sales;
+        pessimistic += -cost*(d.Delivered_prediction - Math.min(d.Delivered_prediction, d.Sales))+ benefit*Math.min(d.Delivered_prediction, d.Sales);
+        optimistic += -cost*(d.Delivered_prediction - Math.min(d.Delivered_prediction, d.Pot_Sales))+ benefit*Math.min(d.Delivered_prediction, d.Pot_Sales);
+        reality += -cost*(d.Delivered - d.Sales) + benefit*d.Sales;
+      }
+
+      return [{'abscisse':'Reality', 'height_value':Math.trunc(reality/1000), 'unit':'k€'},
+        {'abscisse':'Optimistic', 'height_value':Math.trunc(optimistic/1000), 'unit':'k€'},
+        {'abscisse':'Pessimistic', 'height_value':Math.trunc(pessimistic/1000), 'unit':'k€'}];
+    }
+
+  // Chiffre d'affaire
+    const compute_ca = (cost, benefit) => {
+      let pessimistic = 0;
+      let optimistic = 0;
+      let reality = 0;
+
+      for (let d of data){
         pessimistic += -cost*d.Delivered_prediction + benefit*Math.min(d.Delivered_prediction, d.Sales);
         optimistic += -cost*d.Delivered_prediction + benefit*Math.min(d.Delivered_prediction, d.Pot_Sales);
         reality += -cost*(d.Delivered) + benefit*d.Sales;
@@ -262,6 +339,38 @@
         {'abscisse':'Optimistic', 'height_value':Math.trunc(optimistic/1000), 'unit':'k€'},
         {'abscisse':'Pessimistic', 'height_value':Math.trunc(pessimistic/1000), 'unit':'k€'}];
     }
+
+  // VAZ
+    const compute_vaz = () => {
+
+      // faire la somme des ventes
+      // compter le nombre de ruptures et le diviser par la somme des ventes
+
+      let pessimistic = 0;
+      let optimistic = 0;
+      let reality = 0;
+
+      let sum_pes_sales = 0;
+      let sum_opt_sales = 0;
+      let sum_sales = 0;
+
+      for (let d of data){
+        sum_pes_sales += Math.min(d.Delivered_prediction, d.Sales);
+        sum_opt_sales += Math.min(d.Delivered_prediction, d.Pot_Sales);
+        sum_sales += d.Sales;
+
+
+        pessimistic += +(d.Delivered_prediction === Math.min(d.Delivered_prediction, d.Sales));
+        optimistic += +(d.Delivered_prediction === Math.min(d.Delivered_prediction, d.Pot_Sales));
+        reality += +(d.Delivered === d.Sales);
+      }
+
+      return [{'abscisse':'Reality', 'height_value':Math.trunc(reality/sum_sales*100)/100, 'unit':''},
+        {'abscisse':'Optimistic', 'height_value':Math.trunc(optimistic/sum_opt_sales*100)/100, 'unit':''},
+        {'abscisse':'Pessimistic', 'height_value':Math.trunc(pessimistic/sum_pes_sales*100)/100, 'unit':''}];
+    }
+
+
 
     const find_best_sigma = (cost, benefit) => {
       let best_sigma = 0;
@@ -280,11 +389,16 @@
 
     const update_plots = () => {
       compute_deli(sigma);
-      ruptures_bar = new BarPlot('ruptures', ratio_rupture(), 'Journaux');
-      sales_bar = new BarPlot('sales', nb_sales(), 'Journaux');
-      delivered_bar = new BarPlot('delivered', nb_delivered(), 'Journaux');
-      unsales_bar = new BarPlot('unsales', nb_unsales(), 'Journaux');
       roi_bar = new BarPlot('roi', compute_roi(cost, benefit), 'k€   Euros');
+      ca_bar = new BarPlot('ca', compute_ca(cost, benefit), 'k€ Euros');
+      vaz_bar = new BarPlot('vaz', compute_vaz(), '');
+
+      delivered_bar = new BarPlot('delivered', nb_delivered(), 'Journaux');
+      sales_bar = new BarPlot('sales', nb_sales(), 'Journaux');
+      unsales_bar = new BarPlot('unsales', nb_unsales(), 'Journaux');
+      
+      ruptures_ratio_bar = new BarPlot('rupture_ratio', ratio_rupture(), '%');
+      ruptures_bar = new BarPlot('ruptures', nb_ruptures(), 'Points de ventes (x1000)');
     }
 
     let cost_entry = document.getElementById('cost_price');
